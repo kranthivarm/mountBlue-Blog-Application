@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class PostTagsEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  int post_id;
     private  int tag_id;
     private LocalDateTime created_at;
