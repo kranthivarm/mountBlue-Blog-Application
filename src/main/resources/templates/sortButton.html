@@ -1,0 +1,27 @@
+
+<div
+   th:fragment="sortingButton"
+   style="
+        position:absolute;
+        top:10px;
+        right:20px;
+        width:40px;
+        height:40px;
+        background-color:lightpink;
+        border-radius:50%;
+        border:2px solid black;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    "
+>
+    <button
+        onclick="window.location.href='/blogPost/allblogs?sort=true'"
+        style="
+            border:none;
+            background-color:transparent;
+            "
+    >
+        sort
+    </button>
+</div>

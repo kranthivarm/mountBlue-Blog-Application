@@ -55,4 +55,14 @@ public class PostService {
         //return model again;
         return modelMapper.map(insertedEntity,PostModel.class);
     }
+    public  List<PostModel> findAllOrderByPublishedAt(){
+        List<PostEntity>postEntities=postRepository.findAllByOrderByPublishedAtAsc();
+        List<PostModel>posts=new ArrayList<>();
+        for(PostEntity entity: postEntities) {
+            posts.add(
+                 modelMapper.map(entity,PostModel.class)
+            );
+        }
+        return posts;
+    }
 }

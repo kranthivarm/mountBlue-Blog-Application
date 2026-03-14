@@ -23,20 +23,20 @@ public class PostEntity {
     private String content;
     private String author;
 
-    private LocalDateTime published_at;
-    private boolean is_published;
+    private LocalDateTime publishedAt;
+    private boolean isPublished;
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist(){
-        this.is_published=true;
-        this.published_at=LocalDateTime.now();
+        this.isPublished =true;
+        this.publishedAt =LocalDateTime.now();
     }
 
 }

@@ -16,13 +16,16 @@ public class BlogsController {
         this.postService=postService;
     }
 
+    //all blogs + sorting
     @GetMapping("/allblogs")//all posts
-    public  String getAllBlogs(Model model){
+    public  String getAllBlogs(Model model, @RequestParam(value = "sort", defaultValue = "false") String sort){
         System.out.println("all blogs controller");
-        model.addAttribute("allPosts",postService.findAll());
-        return "allBlogsPage";
+        if(sort.equals("false")) model.addAttribute("allPosts",postService.findAll());
+        else model.addAttribute("allPosts",postService.findAllOrderByPublishedAt());
 
+        return "allBlogsPage";
     }
+
     @GetMapping("/{id}")
     public  String viewPost(@PathVariable String id,Model model ){
         System.out.println("single page controller");
@@ -30,8 +33,7 @@ public class BlogsController {
         return "singlePostPage";
     }
 
-    //creation of new blog post http://localhost:40324/blogPost/allBlogs/allblogs
-
+    //creation of new blog post
     @GetMapping("/blogCreationForm")
     public String postFormForNewPost(Model model){
         System.out.println("creation form controller");
@@ -47,5 +49,11 @@ public class BlogsController {
             return "redirect:/blogPost/"+insertedInstance.getId();
         }
         else return "redirect:/blogPost/blogCreationForm";
+    }
+    @PostMapping("/deletePost/{id}")
+    public String deletePost(@PathVariable String id){
+        System.out.println("deleteBy Id Ctllr");
+
+        return "redirect:/blogPost/allblogs";
     }
 }

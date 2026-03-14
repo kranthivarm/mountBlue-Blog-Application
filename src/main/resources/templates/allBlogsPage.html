@@ -16,7 +16,10 @@
     </style>
 </head>
 <body>
-    <h1>All Posts</h1>
+    <h1>
+        All Posts
+        <span></span>
+    </h1>
 <!--    <div th:each="post : ${allPosts}">-->
 <!--        <p><strong>ID:</strong> <span th:text="${post.id}">ID</span></p>-->
 <!--        <p><strong>Title:</strong> <span th:text="${post.title}">Title</span></p>-->
@@ -28,6 +31,7 @@
 <!--        <p><strong>Created At:</strong> <span th:text="${post.createdAt}">Created Date</span></p>-->
 <!--        <p><strong>Updated At:</strong> <span th:text="${post.updatedAt}">Updated Date</span></p>-->
 <!--    </div>-->
+    <div th:replace="~{sortButton::sortingButton}"></div>
     <table border="1" >
         <thead>
         <tr style="background-color: grey;">
@@ -42,12 +46,12 @@
             <td th:text="${post?.title ?: 'No Title'}">Title</td>
             <td>
                 <a
-                   th:href="@{/allblogs/{id}(id=${post.id})}"
+                   th:href="@{/blogPost/{id}(id=${post.id})}"
                    th:text="${post?.excerpt}"
                 ></a>
             </td>
             <td th:text="${post?.author ?: 'No Author'}">Author</td>
-            <td th:text="${post?.published_at ?: 'No Date'}">Published At</td>
+            <td th:text="${post?.publishedAt ?: 'No Date'}">Published At</td>
         </tr>
         </tbody>
     </table>

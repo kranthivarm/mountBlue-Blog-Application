@@ -11,8 +11,8 @@ public class PostModel {
     private String excerpt;
     private String content;
     private String author;
-    private LocalDateTime published_at;
-    private boolean is_published;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
+    private LocalDateTime publishedAt;
+    private boolean isPublished;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

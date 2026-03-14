@@ -61,20 +61,20 @@
     </style>
 </head>
 <body>
-<div class="post-container">
-    <h1 th:text="${post?.id + '. ' + post?.title}">Post Title</h1>
+    <div class="post-container">
+        <h1 th:text="${post?.id + '. ' + post?.title}">Post Title</h1>
 
-    <div class="post-meta">
-        <p><strong>Created At:</strong> <span th:text="${#temporals.format(post?.created_at, 'MMM dd, yyyy HH:mm')}">Created Date</span></p>
-        <p><strong>Updated At:</strong> <span th:text="${#temporals.format(post?.updated_at, 'MMM dd, yyyy HH:mm')}">Updated Date</span></p>
-        <p><strong>Author:</strong> <span class="post-author" th:text="${post?.author}">Author Name</span></p>
+        <div class="post-meta">
+            <p><strong>Created At:</strong> <span th:text="${#temporals.format(post?.createdAt, 'MMM dd, yyyy HH:mm')}">Created Date</span></p>
+            <p><strong>Updated At:</strong> <span th:text="${#temporals.format(post?.updatedAt, 'MMM dd, yyyy HH:mm')}">Updated Date</span></p>
+            <p><strong>Author:</strong> <span class="post-author" th:text="${post?.author}">Author Name</span></p>
+        </div>
+
+        <div class="post-excerpt" th:text="${post?.excerpt ?: 'No Summary'}" th:if="${post?.excerpt != null}">Post excerpt goes here...</div>
+
+        <div class="post-content" th:text="${post?.content ?: 'No Content'}">Full post content goes here...</div>
+
+    <!--    <a th:href="@{/blogPost/allblogs}" class="back-link">← Back to All Posts</a>-->
     </div>
-
-    <div class="post-excerpt" th:text="${post?.excerpt ?: 'No Summary'}" th:if="${post?.excerpt != null}">Post excerpt goes here...</div>
-
-    <div class="post-content" th:text="${post?.content ?: 'No Content'}">Full post content goes here...</div>
-
-<!--    <a th:href="@{/blogPost/allblogs}" class="back-link">← Back to All Posts</a>-->
-</div>
 </body>
 </html>
