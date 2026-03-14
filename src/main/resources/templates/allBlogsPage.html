@@ -13,6 +13,9 @@
         div{
             border: thick solid blue;
         }
+        td{
+            padding:7px;
+        }
     </style>
 </head>
 <body>
@@ -39,6 +42,7 @@
             <th>Excerpt</th>
             <th>Author</th>
             <th>Published At</th>
+            <th style="color:lightred">Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -52,6 +56,11 @@
             </td>
             <td th:text="${post?.author ?: 'No Author'}">Author</td>
             <td th:text="${post?.publishedAt ?: 'No Date'}">Published At</td>
+            <td>
+                <a
+                   th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
+                >DeleteThisBlog</a>
+            </td>
         </tr>
         </tbody>
     </table>

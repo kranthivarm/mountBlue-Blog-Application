@@ -29,7 +29,7 @@ public class BlogsController {
     @GetMapping("/{id}")
     public  String viewPost(@PathVariable String id,Model model ){
         System.out.println("single page controller");
-        model.addAttribute("post",postService.getPost(Integer.parseInt(id)));
+        model.addAttribute("post",postService.findById(Integer.parseInt(id)));
         return "singlePostPage";
     }
 
@@ -40,6 +40,7 @@ public class BlogsController {
         model.addAttribute("post",new PostModel());
         return "blogCreationForm";
     }
+
     @PostMapping("/newPost")
     public  String createNewPost(@ModelAttribute PostModel postModel,Model model){
         System.out.println(" new post controller");
@@ -50,10 +51,20 @@ public class BlogsController {
         }
         else return "redirect:/blogPost/blogCreationForm";
     }
-    @PostMapping("/deletePost/{id}")
+
+//    @DeleteMapping("/deletePost/{id}")//browsers not supporting but we can
+    @GetMapping("/deletePost/{id}")
     public String deletePost(@PathVariable String id){
         System.out.println("deleteBy Id Ctllr");
-
+        postService.deleteById(Integer.parseInt(id));
         return "redirect:/blogPost/allblogs";
     }
+
+    @PostMapping("/updatePostForm/{id}")
+    public  String updatePostForm(@PathVariable String id, Model model){
+        model.addAttribute("post",postService.findById(Integer.parseInt(id)));
+        return "updatePostForm";
+    }
+
+
 }

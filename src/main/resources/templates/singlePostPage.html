@@ -60,7 +60,34 @@
         }
     </style>
 </head>
-<body>
+<body >
+<!--    delete button  -->
+    <div style="
+         position:absolute;
+         top:10px;
+         right:20px;
+         width:60px;
+         height:40px;
+         background-color:lightpink;
+         border-radius:50%;
+         border:2px solid black;
+         display:flex;
+         align-items:center;
+         justify-content:center;
+    ">
+        <a
+           th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
+           style="text-decoration:none; color:black;"
+        >Delete</a>
+<!--        <button-->
+<!--            onclick="window.location.href='@{/blogPost/deletePost/{id}(id=${post?.id})}'"-->
+<!--            style="-->
+<!--                border:none;-->
+<!--                background-color:transparent;-->
+<!--            "-->
+<!--        >Delete-->
+<!--        </button>-->
+    </div>
     <div class="post-container">
         <h1 th:text="${post?.id + '. ' + post?.title}">Post Title</h1>
 

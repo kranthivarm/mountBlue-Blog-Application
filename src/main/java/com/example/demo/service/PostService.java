@@ -43,7 +43,7 @@ public class PostService {
         return posts;
     }
 
-    public PostModel getPost(int id) {
+    public PostModel findById(int id) {
         return modelMapper.map(postRepository.findById(id),PostModel.class);
     }
     @Transactional
@@ -64,5 +64,8 @@ public class PostService {
             );
         }
         return posts;
+    }
+    public void deleteById(int id){
+        postRepository.deleteById(id);
     }
 }
