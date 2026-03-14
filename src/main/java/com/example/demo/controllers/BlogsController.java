@@ -1,28 +1,51 @@
 package com.example.demo.controllers;
 
+import com.example.demo.models.PostModel;
 import com.example.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
-//@RequestMapping("/posts")
+@RequestMapping("/blogPost")
 public class BlogsController {
     private final PostService postService;
     @Autowired
     BlogsController(PostService postService){
         this.postService=postService;
     }
+
     @GetMapping("/allblogs")//all posts
     public  String getAllBlogs(Model model){
+        System.out.println("all blogs controller");
         model.addAttribute("allPosts",postService.findAll());
         return "allBlogsPage";
+
     }
-    @GetMapping("/post/{id}")
-    public  String viewPost(@PathVariable int id,Model model ){
-        return "singlePost";
+    @GetMapping("/{id}")
+    public  String viewPost(@PathVariable String id,Model model ){
+        System.out.println("single page controller");
+        model.addAttribute("post",postService.getPost(Integer.parseInt(id)));
+        return "singlePostPage";
+    }
+
+    //creation of new blog post http://localhost:40324/blogPost/allBlogs/allblogs
+
+    @GetMapping("/blogCreationForm")
+    public String postFormForNewPost(Model model){
+        System.out.println("creation form controller");
+        model.addAttribute("post",new PostModel());
+        return "blogCreationForm";
+    }
+    @PostMapping("/newPost")
+    public  String createNewPost(@ModelAttribute PostModel postModel,Model model){
+        System.out.println(" new post controller");
+        PostModel insertedInstance = postService.createNewPost(postModel);
+        if(insertedInstance!=null){
+            //redirecting to singlePOstPost
+            return "redirect:/blogPost/"+insertedInstance.getId();
+        }
+        else return "redirect:/blogPost/blogCreationForm";
     }
 }

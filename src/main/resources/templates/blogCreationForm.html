@@ -1,0 +1,97 @@
+<!doctype html>
+<html
+    lang="en"
+    xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .formDiv {
+            background-color: grey;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px black;
+            width: 100%;
+            max-width: 500px;
+            align-items
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: black;
+            font-weight: 600;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .submit-btn {
+            width: 100%;
+            background-color: white;
+            color: black;
+            padding: 12px;
+<!--            border: thick solid black;;-->
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .error{
+            color:red;
+            font-weight:bold;
+        }
+
+    </style>
+</head>
+<body
+    style="
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        "
+>
+    <div class="formDiv">
+        <h2 style="text-align:center; color:pink">Create New Post</h2>
+
+        <form th:action="@{/blogPost/newPost}" th:object="${post}" method="post">
+
+                <label for="title">Title</label>
+                <input type="text" id="title" th:field="*{title}" placeholder="Enter title..." required>
+                <span
+                    class="error"
+                    th:if="${#fields.hasErrors('title')}"
+                    th:errors="{*title}"
+                />
+            <br>
+                <label for="excerpt">Excerpt</label>
+                <input type="text" id="excerpt" th:field="*{excerpt}" placeholder="Short summary...">
+
+            <br>
+                <label for="author">Author</label>
+                <input type="text" id="author" th:field="*{author}" placeholder="Author name...">
+            <br>
+                <label for="content">Content</label>
+                <textarea id="content" th:field="*{content}" placeholder="Write your content here..."></textarea>
+            <br>
+
+            <button type="submit" class="submit-btn">Publish Post</button>
+
+        </form>
+    </div>
+</body>
+</html>

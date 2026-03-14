@@ -6,6 +6,7 @@ import com.example.demo.repository.PostRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,5 +41,18 @@ public class PostService {
             );
         }
         return posts;
+    }
+
+    public PostModel getPost(int id) {
+        return modelMapper.map(postRepository.findById(id),PostModel.class);
+    }
+    @Transactional
+    public PostModel createNewPost(PostModel postModel){
+        //converting model to entity
+        PostEntity newPostEntity =modelMapper.map(postModel,PostEntity.class);
+        //inserting entity
+        PostEntity insertedEntity=postRepository.save(newPostEntity);
+        //return model again;
+        return modelMapper.map(insertedEntity,PostModel.class);
     }
 }

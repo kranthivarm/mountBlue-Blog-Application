@@ -17,16 +17,39 @@
 </head>
 <body>
     <h1>All Posts</h1>
-    <div th:each="post : ${allPosts}">
-        <p><strong>ID:</strong> <span th:text="${post.id}">ID</span></p>
-        <p><strong>Title:</strong> <span th:text="${post.title}">Title</span></p>
-        <p><strong>Excerpt:</strong> <span th:text="${post.excerpt}">Excerpt</span></p>
-        <p><strong>Content:</strong> <span th:text="${post.content}">Content</span></p>
-        <p><strong>Author:</strong> <span th:text="${post.author}">Author</span></p>
-        <p><strong>Published At:</strong> <span th:text="${post.publishedAt}">Published Date</span></p>
-        <p><strong>Is Published:</strong> <span th:text="${post.published}">Status</span></p>
-        <p><strong>Created At:</strong> <span th:text="${post.createdAt}">Created Date</span></p>
-        <p><strong>Updated At:</strong> <span th:text="${post.updatedAt}">Updated Date</span></p>
-    </div>
+<!--    <div th:each="post : ${allPosts}">-->
+<!--        <p><strong>ID:</strong> <span th:text="${post.id}">ID</span></p>-->
+<!--        <p><strong>Title:</strong> <span th:text="${post.title}">Title</span></p>-->
+<!--        <p><strong>Excerpt:</strong> <span th:text="${post.excerpt}">Excerpt</span></p>-->
+<!--        <p><strong>Content:</strong> <span th:text="${post.content}">Content</span></p>-->
+<!--        <p><strong>Author:</strong> <span th:text="${post.author}">Author</span></p>-->
+<!--        <p><strong>Published At:</strong> <span th:text="${post.publishedAt}">Published Date</span></p>-->
+<!--        <p><strong>Is Published:</strong> <span th:text="${post.published}">Status</span></p>-->
+<!--        <p><strong>Created At:</strong> <span th:text="${post.createdAt}">Created Date</span></p>-->
+<!--        <p><strong>Updated At:</strong> <span th:text="${post.updatedAt}">Updated Date</span></p>-->
+<!--    </div>-->
+    <table border="1" >
+        <thead>
+        <tr style="background-color: grey;">
+            <th>Title</th>
+            <th>Excerpt</th>
+            <th>Author</th>
+            <th>Published At</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="post : ${allPosts}">
+            <td th:text="${post?.title ?: 'No Title'}">Title</td>
+            <td>
+                <a
+                   th:href="@{/allblogs/{id}(id=${post.id})}"
+                   th:text="${post?.excerpt}"
+                ></a>
+            </td>
+            <td th:text="${post?.author ?: 'No Author'}">Author</td>
+            <td th:text="${post?.published_at ?: 'No Date'}">Published At</td>
+        </tr>
+        </tbody>
+    </table>
 </body>
 </html>

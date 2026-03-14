@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .post-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .post-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        .post-meta p {
+            margin: 5px 0;
+        }
+        .post-author {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .post-excerpt {
+            font-style: italic;
+            color: #555;
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        .post-content {
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="post-container">
+    <h1 th:text="${post?.id + '. ' + post?.title}">Post Title</h1>
+
+    <div class="post-meta">
+        <p><strong>Created At:</strong> <span th:text="${#temporals.format(post?.created_at, 'MMM dd, yyyy HH:mm')}">Created Date</span></p>
+        <p><strong>Updated At:</strong> <span th:text="${#temporals.format(post?.updated_at, 'MMM dd, yyyy HH:mm')}">Updated Date</span></p>
+        <p><strong>Author:</strong> <span class="post-author" th:text="${post?.author}">Author Name</span></p>
+    </div>
+
+    <div class="post-excerpt" th:text="${post?.excerpt ?: 'No Summary'}" th:if="${post?.excerpt != null}">Post excerpt goes here...</div>
+
+    <div class="post-content" th:text="${post?.content ?: 'No Content'}">Full post content goes here...</div>
+
+<!--    <a th:href="@{/blogPost/allblogs}" class="back-link">← Back to All Posts</a>-->
+</div>
+</body>
+</html>
