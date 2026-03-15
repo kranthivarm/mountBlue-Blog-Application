@@ -55,16 +55,22 @@ public class BlogsController {
 //    @DeleteMapping("/deletePost/{id}")//browsers not supporting but we can
     @GetMapping("/deletePost/{id}")
     public String deletePost(@PathVariable String id){
-        System.out.println("deleteBy Id Ctllr");
+        System.out.println("deleteBy Id Ctrlr");
         postService.deleteById(Integer.parseInt(id));
         return "redirect:/blogPost/allblogs";
     }
 
-    @PostMapping("/updatePostForm/{id}")
+    @GetMapping("/updatePostForm/{id}")
     public  String updatePostForm(@PathVariable String id, Model model){
+        System.out.println("updateForm ctrlr");
         model.addAttribute("post",postService.findById(Integer.parseInt(id)));
         return "updatePostForm";
     }
 
-
+    @PostMapping("/update")
+    public String updateBlogPost(@ModelAttribute PostModel postModel){
+        System.out.println("updatePost ctrlr");
+        postService.updatePost(postModel);
+        return "redirect:/blogPost/"+postModel.getId();
+    }
 }

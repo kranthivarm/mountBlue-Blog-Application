@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <form th:action="@{/blogPost/update}"  th:object="${post}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <label>Title</label>
+        <input type="text" th:field="*{title}" />
+        <br>
+        <label>Excerpt</label>
+        <input type="text" th:field="*{excerpt}" />
+        <br>
+        <label>Content</label>
+        <textarea th:field="*{content}"></textarea>
+        <br>
+        <label>Author</label>
+        <input type="text" th:field="*{author}" />
+        <br>
+        <label>Published Date</label>
+        <input type="datetime-local" th:field="*{publishedAt}" />
+        <br>
+        <button type="submit">Update Post</button>
+    </form>
+</body>
+</html>

@@ -5,9 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single Post</title>
     <style>
+        .fixedButton{
+             width:60px;
+             height:40px;
+             background-color:lightpink;
+             border-radius:50%;
+             border:2px solid black;
+             display:flex;
+             align-items:center;
+             justify-content:center;
+        }
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
+            margin: 100px;
+            padding:60px;
             background-color: #f9f9f9;
             color: #333;
         }
@@ -66,28 +77,24 @@
          position:absolute;
          top:10px;
          right:20px;
-         width:60px;
-         height:40px;
-         background-color:lightpink;
-         border-radius:50%;
-         border:2px solid black;
-         display:flex;
-         align-items:center;
-         justify-content:center;
-    ">
+    " class="fixedButton">
         <a
            th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
            style="text-decoration:none; color:black;"
         >Delete</a>
-<!--        <button-->
-<!--            onclick="window.location.href='@{/blogPost/deletePost/{id}(id=${post?.id})}'"-->
-<!--            style="-->
-<!--                border:none;-->
-<!--                background-color:transparent;-->
-<!--            "-->
-<!--        >Delete-->
-<!--        </button>-->
     </div>
+<!--    updatebutton-->
+    <div class="fixedButton" style="
+             position:absolute;
+             top:10px;
+             right:150px;
+        ">
+        <a
+            th:href="@{/blogPost/updatePostForm/{id}(id=${post.id})}"
+            style="text-decoration:none; color:black;"
+        >Edit</a>
+    </div>
+
     <div class="post-container">
         <h1 th:text="${post?.id + '. ' + post?.title}">Post Title</h1>
 

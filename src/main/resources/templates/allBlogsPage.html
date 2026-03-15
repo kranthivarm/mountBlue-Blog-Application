@@ -42,7 +42,8 @@
             <th>Excerpt</th>
             <th>Author</th>
             <th>Published At</th>
-            <th style="color:lightred">Delete</th>
+            <th>Update</th>
+            <th style="color:red">Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -56,6 +57,12 @@
             </td>
             <td th:text="${post?.author ?: 'No Author'}">Author</td>
             <td th:text="${post?.publishedAt ?: 'No Date'}">Published At</td>
+            <td>
+                <a
+                  th:href="@{/blogPost/updatePostForm/{id}(id=${post.id})}"
+                >UpdateThispost
+                </a>
+            </td>
             <td>
                 <a
                    th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"

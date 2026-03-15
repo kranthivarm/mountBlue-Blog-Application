@@ -68,4 +68,10 @@ public class PostService {
     public void deleteById(int id){
         postRepository.deleteById(id);
     }
+    public void updatePost(PostModel postModel){
+        System.out.println("updatePost Service");
+        postRepository.save(
+            modelMapper.map(postModel,PostEntity.class)
+        );
+    }
 }
