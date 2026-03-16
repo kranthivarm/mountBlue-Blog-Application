@@ -39,6 +39,7 @@
             color: #7f8c8d;
             font-size: 0.9em;
             margin-bottom: 20px;
+            padding:10px;
         }
         .post-meta p {
             margin: 5px 0;
@@ -101,7 +102,15 @@
         <div class="post-meta">
             <p><strong>Created At:</strong> <span th:text="${#temporals.format(post?.createdAt, 'MMM dd, yyyy HH:mm')}">Created Date</span></p>
             <p><strong>Updated At:</strong> <span th:text="${#temporals.format(post?.updatedAt, 'MMM dd, yyyy HH:mm')}">Updated Date</span></p>
+            <p><strong>Published At:</strong> <span th:text="${#temporals.format(post?.publishedAt, 'MMM dd, yyyy HH:mm')}">Created Date</span></p>
             <p><strong>Author:</strong> <span class="post-author" th:text="${post?.author}">Author Name</span></p>
+        </div>
+
+        <div>
+            <p>
+                <b>Tags</b>
+                <span th:text="${post?.tags ?: 'No Tags'}"></span>
+            </p>
         </div>
 
         <div class="post-excerpt" th:text="${post?.excerpt ?: 'No Summary'}" th:if="${post?.excerpt != null}">Post excerpt goes here...</div>

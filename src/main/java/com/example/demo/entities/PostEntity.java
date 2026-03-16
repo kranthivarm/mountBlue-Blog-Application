@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -22,7 +23,8 @@ public class PostEntity {
     private String excerpt;
     private String content;
     private String author;
-
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime publishedAt;
     private boolean isPublished;
     @CreatedDate
@@ -33,10 +35,20 @@ public class PostEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToMany
+    @JoinTable(
+         name="PostTags",
+         joinColumns = @JoinColumn(name="postId"),
+         inverseJoinColumns =@JoinColumn(name="tagId")
+    )
+    private List<TagEntity>tags;
+
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private List<CommentsEntity>comments;
+
     @PrePersist
     public void prePersist(){
         this.isPublished =true;
-        this.publishedAt =LocalDateTime.now();
+//        this.publishedAt =LocalDateTime.now();
     }
-
 }

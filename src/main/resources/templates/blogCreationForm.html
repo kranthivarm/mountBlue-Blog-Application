@@ -85,6 +85,14 @@
                 <label for="author">Author</label>
                 <input type="text" id="author" th:field="*{author}" placeholder="Author name...">
             <br>
+<!--            adding tags-->
+                <label for="tags"></label>
+                <input
+                    type="text" id="tags"
+                    th:field="*{tags}"
+                    placeholder="Enter tags separated by comma"
+                >
+            <br>
                 <label for="content">Content</label>
                 <textarea id="content" th:field="*{content}" placeholder="Write your content here..."></textarea>
             <br>
