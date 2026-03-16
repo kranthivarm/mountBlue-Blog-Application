@@ -1,12 +1,12 @@
-package com.example.demo.models;
+package com.example.demo.dtos;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Data
-public class PostModel {
+public class PostDto {
     private int id;
     private String title;
     private String excerpt;
@@ -17,6 +17,6 @@ public class PostModel {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-//    private List<TagModel> tags;
+//    private Set<TagDto> tags;
     private String tags;
 }

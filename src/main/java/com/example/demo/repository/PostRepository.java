@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<PostEntity,Integer> {
     public List<PostEntity> findAllByOrderByPublishedAtAsc();
+    public List<PostEntity> findAllByOrderByPublishedAtDesc();
 }

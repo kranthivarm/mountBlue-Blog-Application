@@ -1,0 +1,66 @@
+<div
+    th:fragment="CommentFormFragment"
+>
+    <div class="form-container">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+            <label for="comment">Comment</label>
+            <textarea id="comment" rows="4" placeholder="Write your comment..."></textarea>
+        </div>
+
+        <a>
+            <div class="addCommentButton">AddComment</div>
+        </a>
+    </div>
+    <style>
+        .form-container {
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+
+        .form-group {
+            margin-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .addCommentButton {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .addCommentButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</div>

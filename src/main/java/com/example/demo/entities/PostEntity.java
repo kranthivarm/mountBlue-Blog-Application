@@ -8,7 +8,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
@@ -41,10 +43,10 @@ public class PostEntity {
          joinColumns = @JoinColumn(name="postId"),
          inverseJoinColumns =@JoinColumn(name="tagId")
     )
-    private List<TagEntity>tags;
+    private Set<TagEntity> tags;
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
-    private List<CommentsEntity>comments;
+    private Set<CommentsEntity> comments;
 
     @PrePersist
     public void prePersist(){

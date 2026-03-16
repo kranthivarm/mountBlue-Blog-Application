@@ -1,6 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.models.PostModel;
+import com.example.demo.dtos.PostDto;
 import com.example.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,35 +16,19 @@ public class BlogsController {
         this.postService=postService;
     }
 
-    //all blogs + sorting
-    @GetMapping("/allblogs")//all posts
-    public  String getAllBlogs(Model model, @RequestParam(value = "sort", defaultValue = "false") String sort){
-        System.out.println("all blogs controller");
-        if(sort.equals("false")) model.addAttribute("allPosts",postService.findAll());
-        else model.addAttribute("allPosts",postService.findAllOrderByPublishedAt());
-
-        return "allBlogsPage";
-    }
-
-    @GetMapping("/{id}")
-    public  String viewPost(@PathVariable String id,Model model ){
-        System.out.println("single page controller");
-        model.addAttribute("post",postService.findById(Integer.parseInt(id)));
-        return "singlePostPage";
-    }
 
     //creation of new blog post
     @GetMapping("/blogCreationForm")
     public String postFormForNewPost(Model model){
         System.out.println("creation form controller");
-        model.addAttribute("post",new PostModel());
+        model.addAttribute("post",new PostDto());
         return "blogCreationForm";
     }
 
     @PostMapping("/newPost")
-    public  String createNewPost(@ModelAttribute PostModel postModel,Model model){
+    public  String createNewPost(@ModelAttribute PostDto postDto, Model model){
         System.out.println(" new post controller");
-        PostModel insertedInstance = postService.createNewPost(postModel);
+        PostDto insertedInstance = postService.createNewPost(postDto);
         if(insertedInstance!=null){
             //redirecting to singlePOstPost
             return "redirect:/blogPost/"+insertedInstance.getId();
@@ -52,12 +36,25 @@ public class BlogsController {
         else return "redirect:/blogPost/blogCreationForm";
     }
 
-//    @DeleteMapping("/deletePost/{id}")//browsers not supporting but we can
-    @GetMapping("/deletePost/{id}")
-    public String deletePost(@PathVariable String id){
-        System.out.println("deleteBy Id Ctrlr");
-        postService.deleteById(Integer.parseInt(id));
-        return "redirect:/blogPost/allblogs";
+    //all blogs + sorting // sortField="publishedAt"&order="asc"
+    @GetMapping("/allblogs")//all posts
+    public  String getAllBlogs(
+            Model model,
+            @RequestParam(value = "sortField", defaultValue = "false") String sort,
+            @RequestParam(value="order",defaultValue = "asc")String order
+    ){
+        System.out.println("all blogs controller");
+        if(!sort.equals("publishedAt")) model.addAttribute("allPosts",postService.findAll());
+        else model.addAttribute("allPosts",postService.findAllOrderByPublishedAt(order));
+        return "allBlogsPage";
+    }
+
+    //find by id
+    @GetMapping("/{id}")
+    public  String viewPost(@PathVariable String id,Model model ){
+        System.out.println("single page controller");
+        model.addAttribute("post",postService.findById(Integer.parseInt(id)));
+        return "singlePostPage";
     }
 
     @GetMapping("/updatePostForm/{id}")
@@ -68,9 +65,17 @@ public class BlogsController {
     }
 
     @PostMapping("/update")
-    public String updateBlogPost(@ModelAttribute PostModel postModel){
+    public String updateBlogPost(@ModelAttribute PostDto postDto){
         System.out.println("updatePost ctrlr");
-        postService.updatePost(postModel);
-        return "redirect:/blogPost/"+postModel.getId();
+        postService.updatePost(postDto);
+        return "redirect:/blogPost/"+ postDto.getId();
+    }
+
+    //    @DeleteMapping("/deletePost/{id}")//browsers not supporting but we can
+    @GetMapping("/deletePost/{id}")
+    public String deletePost(@PathVariable String id){
+        System.out.println("deleteBy Id Ctrlr");
+        postService.deleteById(Integer.parseInt(id));
+        return "redirect:/blogPost/allblogs";
     }
 }
