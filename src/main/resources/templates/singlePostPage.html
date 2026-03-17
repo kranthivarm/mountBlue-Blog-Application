@@ -122,9 +122,25 @@
 
 
     <div>
-        <div>comment form</div>
+        <h1>Comments</h1>
+<!--        <div>comment form</div>-->
+        <div th:replace="~{commentForm::CommentFormFragment(${post.id})}"></div>
         <div> all comments on post</div>
+<!--        <div th:if="${post == null or #lists.isEmpty(post.comments)}">-->
+<!--            No comments yet-->
+<!--        </div>-->
+        <div th:each="comment: ${post?.comments}"
+             style="border:1px solid #ddd; padding:7px; margin-bottom:5px; border-radius:8px;">
+            <p>
+                <b th:text="${comment?.name ?: 'No name'}">Name</b>
+                <span th:text="${comment?.email ?: 'No email'}">email</span>
+            </p>
+            <p th:text="${comment?.comment ?: 'NoComment'}">Comment text</p>
+            <p style="font-size:12px; color:gray;">
+                Posted at
+                <span th:text="${#temporals.format(comment.createdAt,'MMM dd yyyy HH:mm')}"></span>
+            </p>
+        </div>
     </div>
-
 </body>
 </html>

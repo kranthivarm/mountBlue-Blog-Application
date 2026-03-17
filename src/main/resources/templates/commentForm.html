@@ -1,25 +1,31 @@
 <div
-    th:fragment="CommentFormFragment"
+    th:fragment="CommentFormFragment(postId)"
 >
-    <div class="form-container">
+    <form
+       th:action="@{/comments/addComment/{id}(id=${postId})}"
+       method="post"
+       class="form-container"
+    >
+        <input type="hidden" name="postId" th:value="${postId}">
+
         <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" placeholder="Enter your name">
+            <label >Name</label>
+            <input type="text" name="name" placeholder="Enter your name">
         </div>
         <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="Enter your email">
+            <label >Email</label>
+            <input type="email" name="email" placeholder="Enter your email">
         </div>
 
         <div class="form-group">
-            <label for="comment">Comment</label>
-            <textarea id="comment" rows="4" placeholder="Write your comment..."></textarea>
+            <label >Comment</label>
+            <textarea name="comment" rows="4" placeholder="Write your comment..."></textarea>
         </div>
-
-        <a>
-            <div class="addCommentButton">AddComment</div>
-        </a>
-    </div>
+<!--        <a th:href="@{/blogPost/">-->
+<!--            <div class="addCommentButton">AddComment</div>-->
+<!--        </a>-->
+        <button type="submit" class="addCommentButton">AddComment</button>
+    </form>
     <style>
         .form-container {
             max-width: 400px;
@@ -29,11 +35,9 @@
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
         }
-
         .form-group {
             margin-bottom: 5px;
         }
-
         label {
             display: block;
             margin-bottom: 5px;

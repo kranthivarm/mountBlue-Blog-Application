@@ -1,5 +1,6 @@
 package com.example.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,8 @@ public class CommentsEntity {
     private  String comment;
     //foreign key
     @ManyToOne
-    @JoinColumn(name="postId")
+    @JoinColumn(name="postId", updatable = false)
+    @JsonIgnore //infinite recursion
     private PostEntity post;
 //    private  int post_id;
 

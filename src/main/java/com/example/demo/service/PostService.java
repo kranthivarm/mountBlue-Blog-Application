@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.Utils.EntityToDtoConvertor;
+import com.example.demo.dtos.CommentDto;
 import com.example.demo.entities.PostEntity;
 import com.example.demo.entities.TagEntity;
 import com.example.demo.dtos.PostDto;
@@ -18,62 +20,24 @@ import java.util.List;
 @Service
 public class PostService {
     private final PostRepository postRepository;
-    private final TagRepository tagRepository;
-    private final ModelMapper modelMapper;
+    private final EntityToDtoConvertor entityToDtoConvertor;
 
     @Autowired
     public PostService(
-            PostRepository postRepository,
-            TagRepository tagRepository,
-            ModelMapper modelMapper
+        PostRepository postRepository,
+        EntityToDtoConvertor entityToDtoConvertor
     ){
         this.postRepository=postRepository;
-        this.tagRepository=tagRepository;
-        this.modelMapper=modelMapper;
+        this.entityToDtoConvertor=entityToDtoConvertor;
     }
-    public PostDto postEntityToDto(PostEntity postEntity){
-        PostDto postDto=modelMapper.map(postEntity,PostDto.class);
-        StringBuilder tags=new StringBuilder("");
-        for(TagEntity tagEntity:postEntity.getTags()){
-            if(tagEntity!=null)tags.append(tagEntity.getName()+",");
-        }
-//        tags.deleteCharAt()//delete LastChar;
-        postDto.setTags(tags.toString());
-        return postDto;
-    }
-    public PostEntity postDtoToEntity(PostDto postDto){
-        //converting model to entity without Tags
-        PostEntity newPostEntity =modelMapper.map(postDto,PostEntity.class);
-//        String [] tags= postDto.getTags().split(",");
-        HashSet<String>tagsNameSet=
-                new HashSet<>(
-                        Arrays.asList(
-//                          tags
-                            postDto.getTags().split(",")
-                        )
-                );
-        HashSet<TagEntity> tagsList=new HashSet<>();
-        for(String tagWithSpace:tagsNameSet){
-            String tag=tagWithSpace.trim();
-            if(tag.isEmpty())continue;// to check spaces also
-            TagEntity tagEntity = tagRepository.findByName(tag);
-            if(tagEntity==null){
-                tagEntity=new TagEntity();
-                tagEntity.setName(tag);
-                tagRepository.save(tagEntity);
-            }
-            tagsList.add(tagEntity);
-        }
-        newPostEntity.setTags(tagsList);
-        return newPostEntity;
-    }
+
 
     public List<PostDto> findAll(){
         List<PostEntity>postEntities=postRepository.findAll();
         List<PostDto>postDtos=new ArrayList<>();
         for(PostEntity entity: postEntities){
             postDtos.add(
-                 postEntityToDto(entity)
+                 entityToDtoConvertor.postEntityToDto(entity)
 //                modelMapper.map(entity, PostDto.class)
             );
         }
@@ -92,16 +56,16 @@ public class PostService {
 //            tagStr.append(tagEntity.getName()+",");
 //        }
 //        postDto.setTags(tagStr.toString());
-        PostDto postDto=postEntityToDto(postEntity);
-        return postDto;
+        return entityToDtoConvertor.postEntityToDto(postEntity);
     }
     @Transactional
     public PostDto createNewPost(PostDto postDto){
-        PostEntity newPostEntity =postDtoToEntity(postDto);
+        PostEntity newPostEntity =entityToDtoConvertor.postDtoToEntity(postDto);
         //inserting entity
         PostEntity insertedEntity=postRepository.save(newPostEntity);
         //return model again;
-        return modelMapper.map(insertedEntity, PostDto.class);
+//        return modelMapper.map(insertedEntity, PostDto.class);
+        return  entityToDtoConvertor.postEntityToDto(insertedEntity);
     }
 
     public  List<PostDto> findAllOrderByPublishedAt(String order){
@@ -111,7 +75,8 @@ public class PostService {
         List<PostDto>posts=new ArrayList<>();
         for(PostEntity entity: postEntities) {
             posts.add(
-                 modelMapper.map(entity, PostDto.class)
+//                 modelMapper.map(entity, PostDto.class)
+                    entityToDtoConvertor.postEntityToDto(entity)
             );
         }
         return posts;
@@ -125,7 +90,7 @@ public class PostService {
         System.out.println("updatePost Service");
         postRepository.save(
 //            modelMapper.map(postDto,PostEntity.class)
-              postDtoToEntity(postDto)
+              entityToDtoConvertor.postDtoToEntity(postDto)
         );
     }
 }
