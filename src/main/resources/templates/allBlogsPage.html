@@ -19,22 +19,10 @@
     </style>
 </head>
 <body>
-    <h1>
-        All Posts
-        <span></span>
-    </h1>
-<!--    <div th:each="post : ${allPosts}">-->
-<!--        <p><strong>ID:</strong> <span th:text="${post.id}">ID</span></p>-->
-<!--        <p><strong>Title:</strong> <span th:text="${post.title}">Title</span></p>-->
-<!--        <p><strong>Excerpt:</strong> <span th:text="${post.excerpt}">Excerpt</span></p>-->
-<!--        <p><strong>Content:</strong> <span th:text="${post.content}">Content</span></p>-->
-<!--        <p><strong>Author:</strong> <span th:text="${post.author}">Author</span></p>-->
-<!--        <p><strong>Published At:</strong> <span th:text="${post.publishedAt}">Published Date</span></p>-->
-<!--        <p><strong>Is Published:</strong> <span th:text="${post.published}">Status</span></p>-->
-<!--        <p><strong>Created At:</strong> <span th:text="${post.createdAt}">Created Date</span></p>-->
-<!--        <p><strong>Updated At:</strong> <span th:text="${post.updatedAt}">Updated Date</span></p>-->
-<!--    </div>-->
-    <div th:replace="~{sortButton::sortingButton}"></div>
+    <div th:replace="~{searchAndFiltersDiv::searchAndFilterFragment}"></div>
+
+    <h1>All Posts<span></span></h1>
+<!--    <div th:replace="~{sortButton::sortingButton}"></div>-->
     <table border="1" >
         <thead>
         <tr style="background-color: grey;">

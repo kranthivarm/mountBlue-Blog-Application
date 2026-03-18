@@ -6,6 +6,7 @@ import com.example.demo.dtos.PostDto;
 import com.example.demo.entities.TagEntity;
 import com.example.demo.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,6 @@ public class PostService {
         this.postRepository=postRepository;
         this.entityToDtoConvertorViceVersa = entityToDtoConvertorViceVersa;
     }
-
 
     public List<PostDto> findAll(){
         List<PostEntity>postEntities=postRepository.findAll();
@@ -54,13 +54,13 @@ public class PostService {
 //        postDto.setTags(tagStr.toString());
         return entityToDtoConvertorViceVersa.postEntityToDto(postEntity);
     }
+
     @Transactional
     public PostDto createNewPost(PostDto postDto){
-        PostEntity newPostEntity = entityToDtoConvertorViceVersa.postDtoToEntity(postDto);
+        PostEntity newPostEntity = entityToDtoConvertorViceVersa.postDtoToEntityCreate(postDto);
         //inserting entity
         PostEntity insertedEntity=postRepository.save(newPostEntity);
         //return model again;
-//        return modelMapper.map(insertedEntity, PostDto.class);
         return  entityToDtoConvertorViceVersa.postEntityToDto(insertedEntity);
     }
 
@@ -83,7 +83,6 @@ public class PostService {
     }
 
     public void updatePost(PostDto postDto){
-
 //        PostEntity existing = postRepository.findById(postDto.getId())
 //                .orElseThrow(() -> new RuntimeException("Post not found"));
 //        existing.setTitle(postDto.getTitle());
@@ -97,7 +96,39 @@ public class PostService {
 //            existing.getTags().addAll(tags);
 //        }
         PostEntity existingPostEntity=entityToDtoConvertorViceVersa.postDtoToEntity(postDto);
-
         postRepository.save(existingPostEntity);
+    }
+
+    public List<PostDto> getFilteredPosts(
+            String search, String authorName,
+            List<String>tagNames,
+            String sortField,String order
+    ){
+        System.out.println("all blogsService"+search+authorName);
+        List<PostEntity>postEntities;
+        if((search==null || search.isEmpty()) &&
+        (authorName==null || authorName.isEmpty()) &&
+        (tagNames == null || tagNames.isEmpty())){
+            if(order.equalsIgnoreCase("asc"))
+                postEntities=postRepository.findAllByOrderByPublishedAtAsc();
+            else postEntities=postRepository.findAllByOrderByPublishedAtDesc();
+        }
+        else {
+            Sort sort = order.equalsIgnoreCase("asc") ?
+                    Sort.by(sortField).ascending() :
+                    Sort.by(sortField).descending();
+//            if(tagNames==null || tagNames.isEmpty())tagNames=null;
+
+            boolean skipTagFilter = (tagNames == null || tagNames.isEmpty());
+            List<String> safeTagNames = skipTagFilter ? List.of("__dummy__") : tagNames;
+            postEntities = postRepository.findFilteredPosts(
+                    search, authorName, tagNames, skipTagFilter,sort
+            );
+        }
+        System.out.println("postentities"+postEntities.size());
+        List<PostDto> postDtos=entityToDtoConvertorViceVersa.postEntityToDto(postEntities);
+        System.out.print("dtos" + postDtos.size());
+        for(PostDto postDto:postDtos) System.out.println(postDto.getId());
+        return postDtos;
     }
 }

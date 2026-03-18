@@ -10,6 +10,7 @@ import com.example.demo.repository.TagRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,15 +30,15 @@ public class EntityToDtoConvertorViceVersa {
     }
 
     public Set<TagEntity> tagDtosToEntities(String tagsString){
+        Set<TagEntity> tags = new HashSet<>();
         if(tagsString == null || tagsString.trim().isEmpty()){
-            return null;
+            return tags;
         }
         Set<String> tagNames = Arrays.stream(tagsString.split(","))
                 .map(String::trim)
                 .map(String::toLowerCase)
                 .filter(tag -> !tag.isEmpty())
                 .collect(Collectors.toSet());
-        Set<TagEntity> tags = new HashSet<>();
 
         for(String tag : tagNames){
             TagEntity tagEntity = tagRepository.findByName(tag);
@@ -51,6 +52,7 @@ public class EntityToDtoConvertorViceVersa {
         return tags;
     }
 
+    @Transactional(readOnly = true)
     public PostDto postEntityToDto(PostEntity postEntity){
         PostDto postDto=modelMapper.map(postEntity,PostDto.class);
         //tags
@@ -74,7 +76,21 @@ public class EntityToDtoConvertorViceVersa {
         postDto.setComments(commentDtos);
         return postDto;
     }
+    public List<PostDto> postEntityToDto(List<PostEntity> postEntities){
+        List<PostDto>postDtos=new ArrayList<>();
+        for(PostEntity postEntity:postEntities){
+            postDtos.add(postEntityToDto(postEntity));
+        }
+        return postDtos;
+    }
 
+    public PostEntity postDtoToEntityCreate(PostDto postDto){
+        PostEntity newPostEntity=modelMapper.map(postDto,PostEntity.class);
+        newPostEntity.setTags(tagDtosToEntities(postDto.getTags()));
+        List<CommentsEntity>commentsEntities=new ArrayList<>();
+        newPostEntity.setComments(commentsEntities);
+        return newPostEntity;
+    }
     public PostEntity postDtoToEntity(PostDto postDto){
         //converting model to entity without Tags
 

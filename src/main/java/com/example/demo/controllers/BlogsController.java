@@ -7,6 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Controller
 @RequestMapping("/blogPost")
 public class BlogsController {
@@ -40,12 +44,26 @@ public class BlogsController {
     @GetMapping("/allblogs")//all posts
     public  String getAllBlogs(
             Model model,
-            @RequestParam(value = "sortField", defaultValue = "false") String sort,
-            @RequestParam(value="order",defaultValue = "asc")String order
+            @RequestParam(required = false)String search,
+            @RequestParam(required = false)String authorName,
+            @RequestParam(required = false)String tagNames,
+            @RequestParam(defaultValue = "publishedAt")String sortField,
+            @RequestParam(value="order",defaultValue = "desc")String order
     ){
-        System.out.println("all blogs controller");
-        if(!sort.equals("publishedAt")) model.addAttribute("allPosts",postService.findAll());
-        else model.addAttribute("allPosts",postService.findAllOrderByPublishedAt(order));
+        System.out.println("allBlogs controller"+search+authorName+tagNames);
+        List<String>tagNamesList;
+        if(tagNames!=null && !tagNames.isEmpty())tagNamesList=Arrays.asList(tagNames.split(","));
+        else tagNamesList=new ArrayList<>();
+        List<PostDto>postDtos;
+        postDtos=postService.getFilteredPosts(
+                search,authorName,tagNamesList,sortField,order
+        );
+        model.addAttribute("search",search);
+        model.addAttribute("authorName",authorName);
+        model.addAttribute("tagNames",tagNames);
+        model.addAttribute("sortField",sortField);
+        model.addAttribute("order",order);
+        model.addAttribute("allPosts",postDtos);
         return "allBlogsPage";
     }
 
