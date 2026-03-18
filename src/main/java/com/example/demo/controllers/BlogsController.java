@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/blogPost")
 public class BlogsController {
+    private final int pageSize=5;
     private final PostService postService;
     @Autowired
     BlogsController(PostService postService){
@@ -48,22 +50,28 @@ public class BlogsController {
             @RequestParam(required = false)String authorName,
             @RequestParam(required = false)String tagNames,
             @RequestParam(defaultValue = "publishedAt")String sortField,
-            @RequestParam(value="order",defaultValue = "desc")String order
+            @RequestParam(value="order",defaultValue = "desc")String order,
+            @RequestParam(defaultValue = "0") int page
     ){
         System.out.println("allBlogs controller"+search+authorName+tagNames);
         List<String>tagNamesList;
         if(tagNames!=null && !tagNames.isEmpty())tagNamesList=Arrays.asList(tagNames.split(","));
         else tagNamesList=new ArrayList<>();
         List<PostDto>postDtos;
-        postDtos=postService.getFilteredPosts(
-                search,authorName,tagNamesList,sortField,order
+        Map<String, Object> result =postService.getFilteredPosts(
+                search,authorName,tagNamesList,sortField,order,page,pageSize
         );
+
+        model.addAttribute("allPosts", result.get("posts"));
+        model.addAttribute("currentPage", result.get("currentPage"));
+        model.addAttribute("totalPages", result.get("totalPages"));
+        model.addAttribute("totalItems", result.get("totalItems"));
         model.addAttribute("search",search);
         model.addAttribute("authorName",authorName);
         model.addAttribute("tagNames",tagNames);
         model.addAttribute("sortField",sortField);
         model.addAttribute("order",order);
-        model.addAttribute("allPosts",postDtos);
+
         return "allBlogsPage";
     }
 

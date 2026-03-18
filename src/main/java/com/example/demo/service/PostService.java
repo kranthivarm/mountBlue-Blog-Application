@@ -6,13 +6,14 @@ import com.example.demo.dtos.PostDto;
 import com.example.demo.entities.TagEntity;
 import com.example.demo.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class PostService {
@@ -64,10 +65,11 @@ public class PostService {
         return  entityToDtoConvertorViceVersa.postEntityToDto(insertedEntity);
     }
 
-    public  List<PostDto> findAllOrderByPublishedAt(String order){
+    public  List<PostDto> findAllOrderByPublishedAt(String order,int page,int pageSize){
         List<PostEntity>postEntities;
-        if(order.equals("Asc"))postEntities=postRepository.findAllByOrderByPublishedAtAsc();
-        else postEntities=postRepository.findAllByOrderByPublishedAtDesc();
+        Pageable pageable= PageRequest.of(page,pageSize);
+        if(order.equals("Asc"))postEntities=postRepository.findAllByOrderByPublishedAtAsc(pageable).getContent();
+        else postEntities=postRepository.findAllByOrderByPublishedAtDesc(pageable).getContent();
         List<PostDto>posts=new ArrayList<>();
         for(PostEntity entity: postEntities) {
             posts.add(
@@ -99,36 +101,48 @@ public class PostService {
         postRepository.save(existingPostEntity);
     }
 
-    public List<PostDto> getFilteredPosts(
+    public Map<String,Object> getFilteredPosts(
             String search, String authorName,
             List<String>tagNames,
-            String sortField,String order
+            String sortField,String order,
+            int page,int pageSize
     ){
         System.out.println("all blogsService"+search+authorName);
+
+        Sort sort = order.equalsIgnoreCase("asc") ?
+                Sort.by(sortField).ascending() :
+                Sort.by(sortField).descending();
+
+        Pageable pageable=PageRequest.of(page,pageSize,sort);
+        Page<PostEntity>pageResultsPostEntities;
+
         List<PostEntity>postEntities;
         if((search==null || search.isEmpty()) &&
         (authorName==null || authorName.isEmpty()) &&
         (tagNames == null || tagNames.isEmpty())){
             if(order.equalsIgnoreCase("asc"))
-                postEntities=postRepository.findAllByOrderByPublishedAtAsc();
-            else postEntities=postRepository.findAllByOrderByPublishedAtDesc();
+                pageResultsPostEntities=postRepository.findAllByOrderByPublishedAtAsc(pageable);
+            else pageResultsPostEntities=postRepository.findAllByOrderByPublishedAtDesc(pageable);
         }
         else {
-            Sort sort = order.equalsIgnoreCase("asc") ?
-                    Sort.by(sortField).ascending() :
-                    Sort.by(sortField).descending();
 //            if(tagNames==null || tagNames.isEmpty())tagNames=null;
 
             boolean skipTagFilter = (tagNames == null || tagNames.isEmpty());
             List<String> safeTagNames = skipTagFilter ? List.of("__dummy__") : tagNames;
-            postEntities = postRepository.findFilteredPosts(
-                    search, authorName, tagNames, skipTagFilter,sort
+            pageResultsPostEntities = postRepository.findFilteredPosts(
+//                    search, authorName, safeTagNames, skipTagFilter,sort
+                      search, authorName, safeTagNames, skipTagFilter,pageable
             );
         }
-        System.out.println("postentities"+postEntities.size());
-        List<PostDto> postDtos=entityToDtoConvertorViceVersa.postEntityToDto(postEntities);
-        System.out.print("dtos" + postDtos.size());
-        for(PostDto postDto:postDtos) System.out.println(postDto.getId());
-        return postDtos;
+        List<PostDto> postDtos = entityToDtoConvertorViceVersa
+                .postEntityToDto(pageResultsPostEntities.getContent());
+
+        // Return both the posts and pagination metadata
+        Map<String, Object> result = new HashMap<>();
+        result.put("posts", postDtos);
+        result.put("currentPage", pageResultsPostEntities.getNumber());
+        result.put("totalPages", pageResultsPostEntities.getTotalPages());
+        result.put("totalItems", pageResultsPostEntities.getTotalElements());
+        return result;
     }
 }
