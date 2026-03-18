@@ -1,6 +1,5 @@
 package com.example.demo.controllers;
 
-
 import com.example.demo.dtos.CommentDto;
 import com.example.demo.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +26,33 @@ public class CommentsController {
         return "redirect:/blogPost/"+postId;
     }
 
-    @GetMapping("/editCommentForm/{commentId}")
-    public String editCommentById(@PathVariable int commentId, Model model){
-        System.out.println("coment edit ctrl");
-        CommentDto commentDto=commentService.findByCommentId(commentId);
-        model.addAttribute("comment",commentDto);
-        return "editCommentForm";
-    }
+//   //this is present in blogsController because of postService
+//    @GetMapping("/editCommentForm")
+//    public String editCommentById(
+//        @RequestParam(value = "commentId") String commentId,
+//        @RequestParam(value = "postId") String postId,
+//        Model model
+//    ){
+//        System.out.println("coment edit ctrl");
+////        CommentDto commentDto=commentService.findByCommentId(commentId);
+////        model.addAttribute("comment",commentDto);
+//
+//        return "editCommentForm";
+//    }
     @PostMapping("/updateComment")
     public String updateComment(@ModelAttribute CommentDto commentDto){
-        System.out.println("comment update ctrl");
+        System.out.println("comment update ctrl"+commentDto);
         commentService.updateComment(commentDto);
         return "redirect:/blogPost/"+commentDto.getPostId();
     }
 
+    @GetMapping("/deleteComment")//commentId and postId @requestParams
+    public String deleteComment(
+         @RequestParam(value = "commentId") String commentId,
+         @RequestParam(value = "postId") String postId
+    ){
+        System.out.println("Comment delete cntrl");
+        commentService.deleteCommentBycommentId(Integer.parseInt(commentId));
+        return "redirect:/blogPost/"+postId;
+    }
 }

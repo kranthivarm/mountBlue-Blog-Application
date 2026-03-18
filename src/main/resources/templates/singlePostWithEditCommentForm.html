@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Post</title>
+    <style>
+        .fixedButton{
+             width:60px;
+             height:40px;
+             background-color:lightpink;
+             border-radius:50%;
+             border:2px solid black;
+             display:flex;
+             align-items:center;
+             justify-content:center;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 100px;
+            padding:60px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .post-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .post-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            padding:10px;
+        }
+        .post-meta p {
+            margin: 5px 0;
+        }
+        .post-author {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .post-excerpt {
+            font-style: italic;
+            color: #555;
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        .post-content {
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .commentButton {
+          display: inline-block;
+          padding: 2px 8px;
+          font-size: 14px;
+          color: #333;
+          background-color: #f0f0f0;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+        }
+    </style>
+</head>
+<body >
+<!--    delete button  -->
+<div style="
+         position:fixed;
+         top:10px;
+         right:20px;
+    " class="fixedButton">
+    <a
+            th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
+            style="text-decoration:none; color:black;"
+    >Delete</a>
+</div>
+<!--    updatebutton-->
+<div class="fixedButton" style="
+             position:fixed;
+             top:10px;
+             right:150px;
+        ">
+    <a
+            th:href="@{/blogPost/updatePostForm/{id}(id=${post.id})}"
+            style="text-decoration:none; color:black;"
+    >Edit</a>
+</div>
+
+<div class="post-container">
+    <h1 th:text="${post?.id + '. ' + post?.title}">Post Title</h1>
+
+    <div class="post-meta">
+        <p><strong>Created At:</strong> <span th:text="${#temporals.format(post?.createdAt, 'MMM dd, yyyy HH:mm')}">Created Date</span></p>
+        <p><strong>Updated At:</strong> <span th:text="${#temporals.format(post?.updatedAt, 'MMM dd, yyyy HH:mm')}">Updated Date</span></p>
+        <p><strong>Published At:</strong> <span th:text="${#temporals.format(post?.publishedAt, 'MMM dd, yyyy HH:mm')}">Created Date</span></p>
+        <p><strong>Author:</strong> <span class="post-author" th:text="${post?.author}">Author Name</span></p>
+    </div>
+
+    <div>
+        <p>
+            <b>Tags</b>
+            <span th:text="${post?.tags ?: 'No Tags'}"></span>
+        </p>
+    </div>
+
+    <div class="post-excerpt" th:text="${post?.excerpt ?: 'No Summary'}" th:if="${post?.excerpt != null}">Post excerpt goes here...</div>
+
+    <div class="post-content" th:text="${post?.content ?: 'No Content'}">Full post content goes here...</div>
+
+    <!--    <a th:href="@{/blogPost/allblogs}" class="back-link">← Back to All Posts</a>-->
+</div>
+
+
+<div>
+    <h1>Comments</h1>
+    <!--        <div>comment form</div>-->
+    <div th:replace="~{commentForm::CommentFormFragment(${post.id})}"></div>
+    <div> all comments on post</div>
+
+    <div th:each="comment: ${post?.comments}"
+         style="border:1px solid #ddd; padding:15px; margin-bottom:10px; border-radius:8px; position: relative;">
+
+        <!--         div for showing Comment-->
+        <div th:if="${updateCommentId==null || comment?.id!=updateCommentId}">
+            <div style="display: flex; justify-content: flex-end; gap: 10px; font-size: 12px;">
+                <span><b th:text="${comment?.name ?: 'No name'}">Name</b></span>
+                <span th:text="${comment?.email ?: 'No email'}">email</span>
+            </div>
+
+            <div style="margin: 15px 0; min-height: 4.5em; line-height: 1.5em; overflow: hidden;">
+                <p th:text="${comment?.comment ?: 'No Comment'}" style="margin: 0;">Comment text</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: gray;">
+                    <span>
+                        Posted at
+                        <span th:text="${#temporals.format(comment.createdAt,'MMM dd yyyy HH:mm')}"></span>
+                    </span>
+                <div style="display: flex; gap: 5px;">
+                    <div class="commentButton">
+                        <a
+                                th:href="@{/blogPost/editCommentForm(commentId=${comment.id},postId=${comment.postId})}"
+                                style="text-decoration:none; color:black;"
+                        >Edit</a>
+                    </div>
+                    <div class="commentButton">
+                        <a
+                                th:href="@{/comments/deleteComment(commentId=${comment.id},postId=${comment.postId})}"
+                                style="text-decoration:none; color:red;"
+                        >Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--            this div is for editing comment-->
+        <div th:if="${updateCommentId!=null && comment.id==updateCommentId}">
+
+            <form th:action="@{/comments/updateComment}" method="post">
+                <input type="hidden" name="id" th:value="${comment.id}" />
+                <input type="hidden" name="postId" th:value="${comment.postId}" />
+                <div style="display: flex; justify-content: flex-end; gap: 10px; font-size: 12px;">
+                    <span><input type="text" name="name" th:value="${comment?.name}" style="font-weight:bold;" /></span>
+                    <span><input type="email" name="email" th:value="${comment?.email}" /></span>
+                </div>
+                <div style="margin: 15px 0;">
+                    <textarea name="comment" style="width:100%; min-height:4.5em;" th:text="${comment?.comment}"></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; font-size: 12px;">
+                    <div class="commentButton">
+                        <button type="submit" style="text-decoration:none; color:black;border:none">
+                            Update
+                        </button>
+                    </div>
+                    <div class="commentButton">
+                        <a
+                            th:href="@{/blogPost/{id}(id=${comment.postId})}"
+                            style="text-decoration:none; color:red;"
+                        >Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

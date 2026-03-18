@@ -1,34 +1,30 @@
 package com.example.demo.service;
 
-import com.example.demo.Utils.EntityToDtoConvertor;
-import com.example.demo.dtos.CommentDto;
+import com.example.demo.Utils.EntityToDtoConvertorViceVersa;
 import com.example.demo.entities.PostEntity;
-import com.example.demo.entities.TagEntity;
 import com.example.demo.dtos.PostDto;
+import com.example.demo.entities.TagEntity;
 import com.example.demo.repository.PostRepository;
-import com.example.demo.repository.TagRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PostService {
     private final PostRepository postRepository;
-    private final EntityToDtoConvertor entityToDtoConvertor;
+    private final EntityToDtoConvertorViceVersa entityToDtoConvertorViceVersa;
 
     @Autowired
     public PostService(
         PostRepository postRepository,
-        EntityToDtoConvertor entityToDtoConvertor
+        EntityToDtoConvertorViceVersa entityToDtoConvertorViceVersa
     ){
         this.postRepository=postRepository;
-        this.entityToDtoConvertor=entityToDtoConvertor;
+        this.entityToDtoConvertorViceVersa = entityToDtoConvertorViceVersa;
     }
 
 
@@ -37,7 +33,7 @@ public class PostService {
         List<PostDto>postDtos=new ArrayList<>();
         for(PostEntity entity: postEntities){
             postDtos.add(
-                 entityToDtoConvertor.postEntityToDto(entity)
+                 entityToDtoConvertorViceVersa.postEntityToDto(entity)
 //                modelMapper.map(entity, PostDto.class)
             );
         }
@@ -56,16 +52,16 @@ public class PostService {
 //            tagStr.append(tagEntity.getName()+",");
 //        }
 //        postDto.setTags(tagStr.toString());
-        return entityToDtoConvertor.postEntityToDto(postEntity);
+        return entityToDtoConvertorViceVersa.postEntityToDto(postEntity);
     }
     @Transactional
     public PostDto createNewPost(PostDto postDto){
-        PostEntity newPostEntity =entityToDtoConvertor.postDtoToEntity(postDto);
+        PostEntity newPostEntity = entityToDtoConvertorViceVersa.postDtoToEntity(postDto);
         //inserting entity
         PostEntity insertedEntity=postRepository.save(newPostEntity);
         //return model again;
 //        return modelMapper.map(insertedEntity, PostDto.class);
-        return  entityToDtoConvertor.postEntityToDto(insertedEntity);
+        return  entityToDtoConvertorViceVersa.postEntityToDto(insertedEntity);
     }
 
     public  List<PostDto> findAllOrderByPublishedAt(String order){
@@ -76,7 +72,7 @@ public class PostService {
         for(PostEntity entity: postEntities) {
             posts.add(
 //                 modelMapper.map(entity, PostDto.class)
-                    entityToDtoConvertor.postEntityToDto(entity)
+                    entityToDtoConvertorViceVersa.postEntityToDto(entity)
             );
         }
         return posts;
@@ -87,10 +83,21 @@ public class PostService {
     }
 
     public void updatePost(PostDto postDto){
-        System.out.println("updatePost Service");
-        postRepository.save(
-//            modelMapper.map(postDto,PostEntity.class)
-              entityToDtoConvertor.postDtoToEntity(postDto)
-        );
+
+//        PostEntity existing = postRepository.findById(postDto.getId())
+//                .orElseThrow(() -> new RuntimeException("Post not found"));
+//        existing.setTitle(postDto.getTitle());
+//        existing.setExcerpt(postDto.getExcerpt());
+//        existing.setContent(postDto.getContent());
+//        existing.setAuthor(postDto.getAuthor());
+//
+//        Set<TagEntity> tags = entityToDtoConvertorViceVersa.tagDtosToEntities(postDto.getTags());
+//        if(tags != null){
+//            existing.getTags().clear();
+//            existing.getTags().addAll(tags);
+//        }
+        PostEntity existingPostEntity=entityToDtoConvertorViceVersa.postDtoToEntity(postDto);
+
+        postRepository.save(existingPostEntity);
     }
 }

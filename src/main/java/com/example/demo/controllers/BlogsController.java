@@ -66,7 +66,11 @@ public class BlogsController {
 
     @PostMapping("/update")
     public String updateBlogPost(@ModelAttribute PostDto postDto){
-        System.out.println("updatePost ctrlr");
+        System.out.println(
+                "updatePost ctrlr"+
+                postDto.getTitle()+
+                (postDto.getTags())
+        );
         postService.updatePost(postDto);
         return "redirect:/blogPost/"+ postDto.getId();
     }
@@ -77,5 +81,17 @@ public class BlogsController {
         System.out.println("deleteBy Id Ctrlr");
         postService.deleteById(Integer.parseInt(id));
         return "redirect:/blogPost/allblogs";
+    }
+    //editing comment Form
+    @GetMapping("/editCommentForm")
+    public  String updateCommentById(
+            @RequestParam(value = "commentId") String commentId,
+            @RequestParam(value = "postId") String postId,
+            Model model
+    ){
+        System.out.println("editCommentForm from blogCntr");
+        model.addAttribute("post",postService.findById(Integer.parseInt(postId)));
+        model.addAttribute("updateCommentId",Integer.parseInt(commentId));
+        return "singlePostWithEditCommentForm";
     }
 }

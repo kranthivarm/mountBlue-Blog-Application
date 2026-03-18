@@ -5,26 +5,50 @@ import com.example.demo.dtos.PostDto;
 import com.example.demo.entities.CommentsEntity;
 import com.example.demo.entities.PostEntity;
 import com.example.demo.entities.TagEntity;
+import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.TagRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
-public class EntityToDtoConvertor {
+public class EntityToDtoConvertorViceVersa {
     private  final ModelMapper modelMapper;
     private  final TagRepository tagRepository;
+    private final PostRepository postRepository;
 
     @Autowired
-    EntityToDtoConvertor(ModelMapper mapper, TagRepository tagRepository){
+    EntityToDtoConvertorViceVersa(ModelMapper mapper, TagRepository tagRepository,PostRepository postRepository){
         this.modelMapper=mapper;
         this.tagRepository=tagRepository;
+        this.postRepository=postRepository;
+    }
+
+    public Set<TagEntity> tagDtosToEntities(String tagsString){
+        if(tagsString == null || tagsString.trim().isEmpty()){
+            return null;
+        }
+        Set<String> tagNames = Arrays.stream(tagsString.split(","))
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .filter(tag -> !tag.isEmpty())
+                .collect(Collectors.toSet());
+        Set<TagEntity> tags = new HashSet<>();
+
+        for(String tag : tagNames){
+            TagEntity tagEntity = tagRepository.findByName(tag);
+            if(tagEntity == null){
+                tagEntity = new TagEntity();
+                tagEntity.setName(tag);
+                tagRepository.save(tagEntity);
+            }
+            tags.add(tagEntity);
+        }
+        return tags;
     }
 
     public PostDto postEntityToDto(PostEntity postEntity){
@@ -53,43 +77,30 @@ public class EntityToDtoConvertor {
 
     public PostEntity postDtoToEntity(PostDto postDto){
         //converting model to entity without Tags
-        PostEntity newPostEntity =modelMapper.map(postDto,PostEntity.class);
-//        String [] tags= postDto.getTags().split(",");
-        HashSet<String> tagsNameSet;
-        if(postDto.getTags()==null || postDto.getTags().isEmpty()){
-            newPostEntity.setTags(new HashSet<>());
-            return newPostEntity;
-        }
-        tagsNameSet=new HashSet<>(
-                Arrays.asList(
-                        postDto.getTags().split(",")//tags
-                )
-        );
-        HashSet<TagEntity> tagsList=new HashSet<>();
-        for(String tagWithSpace:tagsNameSet){
-            String tag=tagWithSpace.trim().toLowerCase();
-            if(tag.length()>0)continue;// to check spaces also
-            TagEntity tagEntity = tagRepository.findByName(tag);
-            if(tagEntity==null){
-                tagEntity=new TagEntity();
-                tagEntity.setName(tag);
-                tagRepository.save(tagEntity);
-            }
-            tagsList.add(tagEntity);
-        }
-        newPostEntity.setTags(tagsList);
 
-        //comments;
-        List<CommentsEntity> commentsEntities=new ArrayList<>();
-        if(postDto.getComments()!=null){
-            for(CommentDto commentDto:postDto.getComments()){
-                commentsEntities.add(
-                   commentsDtoToEntity(commentDto)
-                );
-            }
+        PostEntity existingPostEntity = postRepository.findById(postDto.getId())
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        existingPostEntity.setTitle(postDto.getTitle());
+        existingPostEntity.setExcerpt(postDto.getExcerpt());
+        existingPostEntity.setContent(postDto.getContent());
+        existingPostEntity.setAuthor(postDto.getAuthor());
+
+        Set<TagEntity> tags = tagDtosToEntities(postDto.getTags());
+        if(tags != null){
+            existingPostEntity.getTags().clear();
+            existingPostEntity.getTags().addAll(tags);
         }
-        newPostEntity.setComments(commentsEntities);
-        return newPostEntity;
+
+//        //comments;
+//        List<CommentsEntity> commentsEntities=new ArrayList<>();
+//        if(postDto.getComments()!=null){
+//            for(CommentDto commentDto:postDto.getComments()){
+//                commentsEntities.add(
+//                   commentsDtoToEntity(commentDto)
+//                );
+//            }
+//        }
+        return existingPostEntity;
     }
 
     public CommentDto commentEntityToDto(CommentsEntity commentsEntity) {

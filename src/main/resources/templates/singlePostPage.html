@@ -70,12 +70,23 @@
         .back-link:hover {
             text-decoration: underline;
         }
+        .commentButton {
+          display: inline-block;
+          padding: 2px 8px;
+          font-size: 14px;
+          color: #333;
+          background-color: #f0f0f0;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+        }
     </style>
 </head>
 <body >
 <!--    delete button  -->
     <div style="
-         position:absolute;
+         position:fixed;
          top:10px;
          right:20px;
     " class="fixedButton">
@@ -86,7 +97,7 @@
     </div>
 <!--    updatebutton-->
     <div class="fixedButton" style="
-             position:absolute;
+             position:fixed;
              top:10px;
              right:150px;
         ">
@@ -126,20 +137,41 @@
 <!--        <div>comment form</div>-->
         <div th:replace="~{commentForm::CommentFormFragment(${post.id})}"></div>
         <div> all comments on post</div>
-<!--        <div th:if="${post == null or #lists.isEmpty(post.comments)}">-->
-<!--            No comments yet-->
-<!--        </div>-->
+
         <div th:each="comment: ${post?.comments}"
-             style="border:1px solid #ddd; padding:7px; margin-bottom:5px; border-radius:8px;">
-            <p>
-                <b th:text="${comment?.name ?: 'No name'}">Name</b>
-                <span th:text="${comment?.email ?: 'No email'}">email</span>
-            </p>
-            <p th:text="${comment?.comment ?: 'NoComment'}">Comment text</p>
-            <p style="font-size:12px; color:gray;">
-                Posted at
-                <span th:text="${#temporals.format(comment.createdAt,'MMM dd yyyy HH:mm')}"></span>
-            </p>
+             style="border:1px solid #ddd; padding:15px; margin-bottom:10px; border-radius:8px; position: relative;">
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; font-size: 12px;">
+                    <span><b th:text="${comment?.name ?: 'No name'}">Name</b></span>
+                    <span th:text="${comment?.email ?: 'No email'}">email</span>
+                </div>
+
+                <div style="margin: 15px 0; min-height: 4.5em; line-height: 1.5em; overflow: hidden;">
+                    <p th:text="${comment?.comment ?: 'No Comment'}" style="margin: 0;">Comment text</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: gray;">
+                    <span>
+                        Posted at
+                        <span th:text="${#temporals.format(comment.createdAt,'MMM dd yyyy HH:mm')}"></span>
+                    </span>
+                    <div style="display: flex; gap: 5px;">
+                        <div class="commentButton">
+                            <a
+                                th:href="@{/blogPost/editCommentForm(commentId=${comment.id},postId=${comment.postId})}"
+                                style="text-decoration:none; color:black;"
+                            >Edit</a>
+                        </div>
+                        <div class="commentButton">
+                            <a
+                                th:href="@{/comments/deleteComment(commentId=${comment.id},postId=${comment.postId})}"
+                                style="text-decoration:none; color:red;"
+                            >Delete</a>
+                        </div>
+                    </div>
+                </div>
+
+
         </div>
     </div>
 </body>
