@@ -132,6 +132,7 @@
 </div>
 
 
+<!--comments container-->
 <div>
     <h1>Comments</h1>
     <!--        <div>comment form</div>-->
@@ -160,7 +161,7 @@
                 <div style="display: flex; gap: 5px;">
                     <div class="commentButton">
                         <a
-                                th:href="@{/blogPost/editCommentForm(commentId=${comment.id},postId=${comment.postId})}"
+                                th:href="@{/blogPost/editCommentForm(commentId=${comment.id},postId=${comment.postId},commentPage=${commentCurrentPage})}"
                                 style="text-decoration:none; color:black;"
                         >Edit</a>
                     </div>
@@ -175,34 +176,64 @@
         </div>
 
         <!--            this div is for editing comment-->
-        <div th:if="${updateCommentId!=null && comment.id==updateCommentId}">
+    <div th:if="${updateCommentId!=null && comment?.id==updateCommentId}">
 
-            <form th:action="@{/comments/updateComment}" method="post">
-                <input type="hidden" name="id" th:value="${comment.id}" />
-                <input type="hidden" name="postId" th:value="${comment.postId}" />
-                <div style="display: flex; justify-content: flex-end; gap: 10px; font-size: 12px;">
-                    <span><input type="text" name="name" th:value="${comment?.name}" style="font-weight:bold;" /></span>
-                    <span><input type="email" name="email" th:value="${comment?.email}" /></span>
+        <form th:action="@{/comments/updateComment}" method="post">
+            <input type="hidden" name="id" th:value="${comment.id}"  />
+            <input type="hidden" name="postId" th:value="${comment.postId}" />
+            <div style="display: flex; justify-content: flex-end; gap: 10px; font-size: 12px;">
+                <span><input type="text" name="name" th:value="${comment?.name}" style="font-weight:bold;" required /></span>
+                <span><input type="email" name="email" th:value="${comment?.email}" required/></span>
+            </div>
+            <div style="margin: 15px 0;">
+                <textarea name="comment" style="width:100%; min-height:4.5em;" th:text="${comment?.comment}" required></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; font-size: 12px;">
+                <div class="commentButton">
+                    <button type="submit" style="text-decoration:none; color:black;border:none">
+                        Update
+                    </button>
                 </div>
-                <div style="margin: 15px 0;">
-                    <textarea name="comment" style="width:100%; min-height:4.5em;" th:text="${comment?.comment}"></textarea>
+                <div class="commentButton">
+                    <a
+                        th:href="@{/blogPost/{id}(id=${comment.postId})}"
+                        style="text-decoration:none; color:red;"
+                    >Cancel</a>
                 </div>
-                <div style="display: flex; justify-content: flex-end; font-size: 12px;">
-                    <div class="commentButton">
-                        <button type="submit" style="text-decoration:none; color:black;border:none">
-                            Update
-                        </button>
-                    </div>
-                    <div class="commentButton">
-                        <a
-                            th:href="@{/blogPost/{id}(id=${comment.postId})}"
-                            style="text-decoration:none; color:red;"
-                        >Cancel</a>
-                    </div>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
+</div>
+
+    <!--    pages movement div-->
+    <div th:if="${commentTotalPages > 0}"
+         style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;">
+
+        <a th:if="${commentCurrentPage > 0}"
+           th:href="@{/blogPost/{id}(id=${post.id}, commentPage=${commentCurrentPage - 1})}"
+           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none;">
+            &laquo; Prev
+        </a>
+
+        <th:block th:each="i : ${#numbers.sequence(0, commentTotalPages - 1)}">
+            <a th:href="@{/blogPost/{id}(id=${post.id}, commentPage=${i})}"
+               th:text="${i + 1}"
+               th:style="${i == commentCurrentPage}
+                   ? 'padding:6px 12px; border:1px solid #3498db; border-radius:4px; background:#3498db; color:white; text-decoration:none;'
+                   : 'padding:6px 12px; border:1px solid #ccc; border-radius:4px; text-decoration:none;'">
+            </a>
+        </th:block>
+
+        <a th:if="${commentCurrentPage < commentTotalPages - 1}"
+           th:href="@{/blogPost/{id}(id=${post.id}, commentPage=${commentCurrentPage + 1})}"
+           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none;">
+            Next &raquo;
+        </a>
+    </div>
+
+    <p style="text-align: center; color: #666; margin-top: 8px;"
+       th:text="'Page ' + (${commentCurrentPage} + 1) + ' of ' + ${commentTotalPages} + ' (' + ${commentTotalItems} + ' comments)'">
+    </p>
 </div>
 </body>
 </html>

@@ -64,16 +64,17 @@ public class EntityToDtoConvertorViceVersa {
         postDto.setTags(tags.toString());
 
         //comments
-        List<CommentDto> commentDtos=
-                postEntity.getComments()
-                   .stream()
-                   .map(
-                      commentsEntity -> {
-                         return commentEntityToDto(commentsEntity);
-                      }
-                   )
-                   . toList();
-        postDto.setComments(commentDtos);
+//        List<CommentDto> commentDtos=
+//                postEntity.getComments()
+//                   .stream()
+//                   .map(
+//                      commentsEntity -> {
+//                         return commentEntityToDto(commentsEntity);
+//                      }
+//                   )
+//                   . toList();
+//        postDto.setComments(commentDtos);
+        postDto.setComments(new ArrayList<>());
         return postDto;
     }
     public List<PostDto> postEntityToDto(List<PostEntity> postEntities){

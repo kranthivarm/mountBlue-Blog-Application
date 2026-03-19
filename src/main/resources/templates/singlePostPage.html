@@ -158,7 +158,7 @@
                     <div style="display: flex; gap: 5px;">
                         <div class="commentButton">
                             <a
-                                th:href="@{/blogPost/editCommentForm(commentId=${comment.id},postId=${comment.postId})}"
+                                th:href="@{/blogPost/editCommentForm(commentId=${comment.id},postId=${comment.postId},commentPage=${commentCurrentPage})}"
                                 style="text-decoration:none; color:black;"
                             >Edit</a>
                         </div>
@@ -170,9 +170,36 @@
                         </div>
                     </div>
                 </div>
+        </div>
+<!--        pages movement  div-->
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;">
 
+            <a th:if="${commentCurrentPage > 0}"
+               th:href="@{/blogPost/{id}(id=${post.id}, commentPage=${commentCurrentPage - 1})}"
+               style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none;">
+                &laquo; Prev
+            </a>
+
+            <th:block th:each="i : ${#numbers.sequence(0, commentTotalPages - 1)}">
+                <a th:href="@{/blogPost/{id}(id=${post.id}, commentPage=${i})}"
+                   th:text="${i + 1}"
+                   th:style="${i == commentCurrentPage}
+               ? 'padding:6px 12px; border:1px solid #3498db; border-radius:4px; background:#3498db; color:white; text-decoration:none;'
+               : 'padding:6px 12px; border:1px solid #ccc; border-radius:4px; text-decoration:none;'">
+                </a>
+            </th:block>
+
+            <a th:if="${commentCurrentPage < commentTotalPages - 1}"
+               th:href="@{/blogPost/{id}(id=${post.id}, commentPage=${commentCurrentPage + 1})}"
+               style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none;">
+                Next &raquo;
+            </a>
 
         </div>
+
+        <p style="text-align: center; color: #666; margin-top: 8px;"
+           th:text="'Page ' + (${commentCurrentPage} + 1) + ' of ' + ${commentTotalPages} + ' (' + ${commentTotalItems} + ' comments)'">
+        </p>
     </div>
 </body>
 </html>

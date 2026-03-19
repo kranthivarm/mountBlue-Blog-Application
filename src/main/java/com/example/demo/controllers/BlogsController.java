@@ -1,6 +1,9 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dtos.CommentDto;
+import com.example.demo.dtos.PagedResult;
 import com.example.demo.dtos.PostDto;
+import com.example.demo.service.CommentService;
 import com.example.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,9 +20,11 @@ import java.util.Map;
 public class BlogsController {
     private final int pageSize=5;
     private final PostService postService;
+    private final CommentService commentService;
     @Autowired
-    BlogsController(PostService postService){
+    BlogsController(PostService postService,CommentService commentService){
         this.postService=postService;
+        this.commentService=commentService;
     }
 
 
@@ -77,9 +82,20 @@ public class BlogsController {
 
     //find by id
     @GetMapping("/{id}")
-    public  String viewPost(@PathVariable String id,Model model ){
+    public  String viewPost(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0")int commentPage,
+            Model model
+    ){
         System.out.println("single page controller");
-        model.addAttribute("post",postService.findById(Integer.parseInt(id)));
+        int postId=Integer.parseInt(id);
+        PostDto postDto=postService.findById(Integer.parseInt(id));
+        PagedResult<CommentDto>commentResult=commentService.findCommentsByPostId(postId,commentPage,pageSize);
+        postDto.setComments(commentResult.getContent());
+        model.addAttribute("post",postDto);
+        model.addAttribute("commentCurrentPage", commentResult.getCurrentPage() );
+        model.addAttribute("commentTotalPages", commentResult.getTotalPages());
+        model.addAttribute("commentTotalItems", commentResult.getTotalItems());
         return "singlePostPage";
     }
 
@@ -111,13 +127,21 @@ public class BlogsController {
     //editing comment Form
     @GetMapping("/editCommentForm")
     public  String updateCommentById(
-            @RequestParam(value = "commentId") String commentId,
-            @RequestParam(value = "postId") String postId,
+            @RequestParam(value = "commentId") int commentId,
+            @RequestParam(value = "postId") int postId,
+            @RequestParam(value = "commentPage", defaultValue = "0")int commentPage,
             Model model
     ){
         System.out.println("editCommentForm from blogCntr");
-        model.addAttribute("post",postService.findById(Integer.parseInt(postId)));
-        model.addAttribute("updateCommentId",Integer.parseInt(commentId));
+        PostDto postDto=postService.findById(postId);
+        PagedResult<CommentDto>commentResult=commentService.findCommentsByPostId(postId,commentPage,pageSize);
+        postDto.setComments(commentResult.getContent());
+
+        model.addAttribute("post",postDto);
+        model.addAttribute("updateCommentId",commentId);
+        model.addAttribute("commentCurrentPage", commentResult.getCurrentPage() );
+        model.addAttribute("commentTotalPages", commentResult.getTotalPages());
+        model.addAttribute("commentTotalItems", commentResult.getTotalItems());
         return "singlePostWithEditCommentForm";
     }
 }

@@ -16,13 +16,13 @@
 
         <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; border: none !important; border-top: 1px solid #eee !important; padding-top: 15px;">
 
-            <input type="text" name="authorName" placeholder="Author Id"
+            <input type="text" name="authorName" placeholder="AuthorName"
                    th:value="${param.authorName}"
                    style="padding: 8px; width: 100px; border: 1px solid #ccc; border-radius: 4px;" />
 
-            <input type="text" name="tagNames" placeholder="Tag Id"
+            <input type="text" name="tagNames" placeholder="TagNamesSeparatedBy ','"
                    th:value="${param.tagNames}"
-                   style="padding: 8px; width: 100px; border: 1px solid #ccc; border-radius: 4px;" />
+                   style="padding: 8px; width: 160px; border: 1px solid #ccc; border-radius: 4px;" />
 
             <div style="display: flex; gap: 5px; border: none !important;">
                 <select name="sortField" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
