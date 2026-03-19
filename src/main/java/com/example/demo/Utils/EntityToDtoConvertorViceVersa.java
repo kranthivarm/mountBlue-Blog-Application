@@ -132,8 +132,11 @@ public class EntityToDtoConvertorViceVersa {
     public CommentsEntity commentsDtoToEntity(CommentDto commentDto) {
         if(commentDto==null)return  null;
         CommentsEntity commentsEntity= modelMapper.map(commentDto, CommentsEntity.class);
-        PostEntity postEntity=new PostEntity();
-        postEntity.setId(commentDto.getPostId());
+        ////This will hit Db;
+//         PostEntity postEntity=postRepository.findById(commentDto.getPostId()).orElseThrow(()-> new RuntimeException("No post found"));
+
+        //  gets a proxy reference JPA recognizes
+        PostEntity postEntity = postRepository.getReferenceById(commentDto.getPostId());
         commentsEntity.setPost(postEntity);
         return commentsEntity;
     }

@@ -27,7 +27,10 @@ public class BlogsController {
         this.commentService=commentService;
     }
 
-
+    @GetMapping("/")
+    public String Homepage(){
+        return "homePage";
+    }
     //creation of new blog post
     @GetMapping("/blogCreationForm")
     public String postFormForNewPost(Model model){
@@ -54,9 +57,9 @@ public class BlogsController {
             @RequestParam(required = false)String search,
             @RequestParam(required = false)String authorName,
             @RequestParam(required = false)String tagNames,
-            @RequestParam(defaultValue = "publishedAt")String sortField,
-            @RequestParam(value="order",defaultValue = "desc")String order,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(required = false, defaultValue = "publishedAt")String sortField,
+            @RequestParam(required = false, value="order",defaultValue = "desc")String order,
+            @RequestParam(required = false, defaultValue = "0") int page
     ){
         System.out.println("allBlogs controller"+search+authorName+tagNames);
         List<String>tagNamesList;
@@ -80,21 +83,25 @@ public class BlogsController {
         return "allBlogsPage";
     }
 
-    //find by id
-    @GetMapping("/{id}")
+    //find by postId
+    @GetMapping("/{postId}")
     public  String viewPost(
-            @PathVariable String id,
+            @PathVariable int postId,
             @RequestParam(defaultValue = "0")int commentPage,
+            @RequestParam(value = "commentId", defaultValue = "-1") int commentId,
             Model model
     ){
+
+
         System.out.println("single page controller");
-        int postId=Integer.parseInt(id);
-        PostDto postDto=postService.findById(Integer.parseInt(id));
+
+        PostDto postDto=postService.findById(postId);
         PagedResult<CommentDto>commentResult=commentService.findCommentsByPostId(postId,commentPage,pageSize);
         postDto.setComments(commentResult.getContent());
         model.addAttribute("post",postDto);
         model.addAttribute("commentCurrentPage", commentResult.getCurrentPage() );
         model.addAttribute("commentTotalPages", commentResult.getTotalPages());
+        model.addAttribute("updateCommentId",commentId);
         model.addAttribute("commentTotalItems", commentResult.getTotalItems());
         return "singlePostPage";
     }
@@ -124,24 +131,24 @@ public class BlogsController {
         postService.deleteById(Integer.parseInt(id));
         return "redirect:/blogPost/allblogs";
     }
-    //editing comment Form
-    @GetMapping("/editCommentForm")
-    public  String updateCommentById(
-            @RequestParam(value = "commentId") int commentId,
-            @RequestParam(value = "postId") int postId,
-            @RequestParam(value = "commentPage", defaultValue = "0")int commentPage,
-            Model model
-    ){
-        System.out.println("editCommentForm from blogCntr");
-        PostDto postDto=postService.findById(postId);
-        PagedResult<CommentDto>commentResult=commentService.findCommentsByPostId(postId,commentPage,pageSize);
-        postDto.setComments(commentResult.getContent());
-
-        model.addAttribute("post",postDto);
-        model.addAttribute("updateCommentId",commentId);
-        model.addAttribute("commentCurrentPage", commentResult.getCurrentPage() );
-        model.addAttribute("commentTotalPages", commentResult.getTotalPages());
-        model.addAttribute("commentTotalItems", commentResult.getTotalItems());
-        return "singlePostWithEditCommentForm";
-    }
+//    //editing comment Form
+//    @GetMapping("/editCommentForm")
+//    public  String updateCommentById(
+//            @RequestParam(value = "commentId") int commentId,
+//            @RequestParam(value = "postId") int postId,
+//            @RequestParam(value = "commentPage", defaultValue = "0")int commentPage,
+//            Model model
+//    ){
+//        System.out.println("editCommentForm from blogCntr");
+//        PostDto postDto=postService.findById(postId);
+//        PagedResult<CommentDto>commentResult=commentService.findCommentsByPostId(postId,commentPage,pageSize);
+//        postDto.setComments(commentResult.getContent());
+//
+//        model.addAttribute("post",postDto);
+//        model.addAttribute("updateCommentId",commentId);
+//        model.addAttribute("commentCurrentPage", commentResult.getCurrentPage() );
+//        model.addAttribute("commentTotalPages", commentResult.getTotalPages());
+//        model.addAttribute("commentTotalItems", commentResult.getTotalItems());
+//        return "singlePostWithEditCommentForm";
+//    }
 }

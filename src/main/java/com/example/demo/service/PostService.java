@@ -118,8 +118,9 @@ public class PostService {
 
         List<PostEntity>postEntities;
         if((search==null || search.isEmpty()) &&
-        (authorName==null || authorName.isEmpty()) &&
-        (tagNames == null || tagNames.isEmpty())){
+            (authorName==null || authorName.isEmpty()) &&
+            (tagNames == null || tagNames.isEmpty())){
+
             if(order.equalsIgnoreCase("asc"))
                 pageResultsPostEntities=postRepository.findAllByOrderByPublishedAtAsc(pageable);
             else pageResultsPostEntities=postRepository.findAllByOrderByPublishedAtDesc(pageable);

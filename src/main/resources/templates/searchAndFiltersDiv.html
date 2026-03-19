@@ -1,50 +1,130 @@
-<div
-        th:fragment="searchAndFilterFragment"
-        style="background: #fff; padding: 20px; border: 1px solid #ddd !important; border-radius: 8px; margin-bottom: 20px;"
->
-    <form th:action="@{/blogPost/allblogs}" method="get" >
-        <div style="display: flex; gap: 10px; margin-bottom: 15px; border: none !important;">
-            <input type="text" name="search"
-                   placeholder="Search posts..."
-                   th:value="${param.search}"
-                   style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" />
+<div th:fragment="searchAndFilterFragment">
+    <style>
+        .sf-wrapper {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .sf-search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .sf-search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .sf-search-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .sf-filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .sf-filter-row input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .sf-author-input { width: 100px; }
+        .sf-tags-input  { width: 160px; }
+        .sf-sort-row {
+            display: flex;
+            gap: 5px;
+        }
+        .sf-sort-row select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .sf-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .sf-apply-btn {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .sf-clear-link {
+            text-decoration: none;
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
 
-            <button type="submit" style="padding: 10px 20px; cursor: pointer; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px;">
-                Search
-            </button>
-        </div>
+    <div class="sf-wrapper">
+        <form th:action="@{/blogPost/allblogs}" method="get" id="mainForm">
 
-        <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; border: none !important; border-top: 1px solid #eee !important; padding-top: 15px;">
-
-            <input type="text" name="authorName" placeholder="AuthorName"
-                   th:value="${param.authorName}"
-                   style="padding: 8px; width: 100px; border: 1px solid #ccc; border-radius: 4px;" />
-
-            <input type="text" name="tagNames" placeholder="TagNamesSeparatedBy ','"
-                   th:value="${param.tagNames}"
-                   style="padding: 8px; width: 160px; border: 1px solid #ccc; border-radius: 4px;" />
-
-            <div style="display: flex; gap: 5px; border: none !important;">
-                <select name="sortField" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                    <option value="publishedAt" th:selected="${param.sortField == 'publishedAt'}">Published</option>
-                    <option value="createdAt" th:selected="${param.sortField == 'createdAt'}">Created</option>
-                </select>
-
-                <select name="order" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                    <option value="asc" th:selected="${param.order == 'asc'}">ASC</option>
-                    <option value="desc" th:selected="${param.order == 'desc'}">DESC</option>
-                </select>
-            </div>
-
-            <div style="margin-left: auto; display: flex; gap: 10px; border: none !important;">
-                <button type="submit" style="padding: 8px 15px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Apply Filters
+            <div class="sf-search-row">
+                <input type="text" name="search" id="searchInput"
+                       placeholder="Search posts..."
+                       th:value="${param.search}"
+                       class="sf-search-input" />
+                <button type="button" onclick="submitSearchOnly()" class="sf-search-btn">
+                    Search
                 </button>
-
-                <a th:href="@{/blogPost/allblogs}" style="text-decoration: none; color: #666; font-size: 13px; align-self: center;">
-                    Clear All
-                </a>
             </div>
-        </div>
-    </form>
+
+            <div class="sf-filter-row">
+
+                <input type="text" name="authorName"
+                       placeholder="AuthorName"
+                       th:value="${param.authorName}"
+                       class="sf-author-input" />
+
+                <input type="text" name="tagNames"
+                       placeholder="TagNames separated by ','"
+                       th:value="${param.tagNames}"
+                       class="sf-tags-input" />
+
+                <div class="sf-sort-row">
+                    <select name="sortField">
+                        <option value="publishedAt" th:selected="${param.sortField == 'publishedAt'}">Published</option>
+                        <option value="createdAt"   th:selected="${param.sortField == 'createdAt'}">Created</option>
+                    </select>
+                    <select name="order">
+                        <option value="asc"  th:selected="${param.order == 'asc'}">ASC</option>
+                        <option value="desc" th:selected="${param.order == 'desc'}">DESC</option>
+                    </select>
+                </div>
+
+                <div class="sf-actions">
+                    <button type="submit" class="sf-apply-btn">Apply Filters</button>
+                    <a th:href="@{/blogPost/allblogs}" class="sf-clear-link">Clear All</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function submitSearchOnly() {
+            const form = document.getElementById('mainForm');
+            form.querySelectorAll('input, select').forEach(el => {
+                if (el.name !== 'search') el.disabled = true;
+            });
+            form.submit();
+            form.querySelectorAll('input, select').forEach(el => {
+                el.disabled = false;
+            });
+        }
+    </script>
 </div>
