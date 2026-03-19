@@ -24,33 +24,13 @@
           align-items: center;
           background-color: white;
         }
-        .buttonDiv{
-            height: 30px;
-            width: 60px;
-            background: #007bff;
-            color: white;
-            text-align: center;
-            line-height: 30px;
-            border-radius: 4px;
-            border: 2px solid #000;
-<!--            background-color:blue;-->
-        }
-        a{
-            text-decoration: none;
-            color: inherit;
-            display: inline-block;
-            margin: 5px;
-        }
+
     </style>
 </head>
 <body >
     <div class="centerDiv">
-        <a th:href="@{/blogPost/allblogs}">
-            <div class="buttonDiv">all Blogs</div>
-        </a>
-        <a th:href="@{/blogPost/blogCreationForm}">
-            <div class="buttonDiv">createPost</div>
-        </a>
+        <div th:replace="~{fragments/btnFragCreateNewPost::newPostBtnFragment}"></div>
+        <div th:replace="~{fragments/buttonFragAllBlogs::AllBlogsBtnFragment}"></div>
     </div>
 </body>
 </html>

@@ -1,0 +1,24 @@
+<div th:fragment="AllBlogsBtnFragment">
+    <style>
+        .buttonDiv{
+        height: 30px;
+        width: 60px;
+        background: #007bff;
+        color: white;
+        text-align: center;
+        line-height: 30px;
+        border-radius: 4px;
+        border: 2px solid #000;
+        <!--            background-color:blue;-->
+        }
+        a{
+        text-decoration: none;
+        color: inherit;
+        display: inline-block;
+        margin: 5px;
+        }
+    </style>
+    <a th:href="@{/blogPost/allblogs}">
+        <div class="buttonDiv">all Blogs</div>
+    </a>
+</div>

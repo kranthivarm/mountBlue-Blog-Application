@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,29 +57,42 @@ public class BlogsController {
             Model model,
             @RequestParam(required = false)String search,
             @RequestParam(required = false)String authorName,
-            @RequestParam(required = false)String tagNames,
+            @RequestParam(required = false)List<String> tagNames,
             @RequestParam(required = false, defaultValue = "publishedAt")String sortField,
             @RequestParam(required = false, value="order",defaultValue = "desc")String order,
+            @RequestParam(required = false,defaultValue = "1900-01-01")String startDate,
+            @RequestParam(required = false)String endDate,
             @RequestParam(required = false, defaultValue = "0") int page
     ){
         System.out.println("allBlogs controller"+search+authorName+tagNames);
-        List<String>tagNamesList;
-        if(tagNames!=null && !tagNames.isEmpty())tagNamesList=Arrays.asList(tagNames.split(","));
-        else tagNamesList=new ArrayList<>();
-        List<PostDto>postDtos;
-        Map<String, Object> result =postService.getFilteredPosts(
-                search,authorName,tagNamesList,sortField,order,page,pageSize
-        );
+        page=Math.max(0,page);
+        if(endDate==null || endDate.isEmpty())endDate= LocalDate.now().toString();
+        LocalDate start=LocalDate.parse(startDate);
+        LocalDate end=LocalDate.parse(endDate);
 
+        model.addAttribute("allAuthors",postService.getAllAuthors());
+        model.addAttribute("allTags",postService.getAllTags());
+
+        List<String>selectedTagsList=(tagNames!=null)?tagNames:new ArrayList<>();
+//        if(tagNames!=null && !tagNames.isEmpty())selectedTagsList=Arrays.asList(tagNames.split(","));
+//        else selectedTagsList=new ArrayList<>();
+        List<PostDto>postDtos;
+
+        Map<String, Object> result =postService.getFilteredPosts(
+                search,authorName,selectedTagsList,sortField,order,
+                start,end,page,pageSize
+        );
         model.addAttribute("allPosts", result.get("posts"));
         model.addAttribute("currentPage", result.get("currentPage"));
         model.addAttribute("totalPages", result.get("totalPages"));
         model.addAttribute("totalItems", result.get("totalItems"));
         model.addAttribute("search",search);
-        model.addAttribute("authorName",authorName);
-        model.addAttribute("tagNames",tagNames);
+        model.addAttribute("selectedAuthor",authorName);
+        model.addAttribute("selectedTagsList",selectedTagsList);
         model.addAttribute("sortField",sortField);
         model.addAttribute("order",order);
+        model.addAttribute("startDate",startDate);
+        model.addAttribute("endDate",endDate);
 
         return "allBlogsPage";
     }
@@ -131,24 +145,4 @@ public class BlogsController {
         postService.deleteById(Integer.parseInt(id));
         return "redirect:/blogPost/allblogs";
     }
-//    //editing comment Form
-//    @GetMapping("/editCommentForm")
-//    public  String updateCommentById(
-//            @RequestParam(value = "commentId") int commentId,
-//            @RequestParam(value = "postId") int postId,
-//            @RequestParam(value = "commentPage", defaultValue = "0")int commentPage,
-//            Model model
-//    ){
-//        System.out.println("editCommentForm from blogCntr");
-//        PostDto postDto=postService.findById(postId);
-//        PagedResult<CommentDto>commentResult=commentService.findCommentsByPostId(postId,commentPage,pageSize);
-//        postDto.setComments(commentResult.getContent());
-//
-//        model.addAttribute("post",postDto);
-//        model.addAttribute("updateCommentId",commentId);
-//        model.addAttribute("commentCurrentPage", commentResult.getCurrentPage() );
-//        model.addAttribute("commentTotalPages", commentResult.getTotalPages());
-//        model.addAttribute("commentTotalItems", commentResult.getTotalItems());
-//        return "singlePostWithEditCommentForm";
-//    }
 }

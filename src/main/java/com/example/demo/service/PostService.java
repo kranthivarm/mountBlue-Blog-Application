@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -105,9 +107,13 @@ public class PostService {
             String search, String authorName,
             List<String>tagNames,
             String sortField,String order,
+            LocalDate startDate,LocalDate endDate,
             int page,int pageSize
     ){
         System.out.println("all blogsService"+search+authorName);
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime   = endDate.atTime(23, 59, 59);
 
         Sort sort = order.equalsIgnoreCase("asc") ?
                 Sort.by(sortField).ascending() :
@@ -115,26 +121,17 @@ public class PostService {
 
         Pageable pageable=PageRequest.of(page,pageSize,sort);
         Page<PostEntity>pageResultsPostEntities;
-
-        List<PostEntity>postEntities;
-        if((search==null || search.isEmpty()) &&
-            (authorName==null || authorName.isEmpty()) &&
-            (tagNames == null || tagNames.isEmpty())){
-
-            if(order.equalsIgnoreCase("asc"))
-                pageResultsPostEntities=postRepository.findAllByOrderByPublishedAtAsc(pageable);
-            else pageResultsPostEntities=postRepository.findAllByOrderByPublishedAtDesc(pageable);
-        }
-        else {
-//            if(tagNames==null || tagNames.isEmpty())tagNames=null;
-
             boolean skipTagFilter = (tagNames == null || tagNames.isEmpty());
             List<String> safeTagNames = skipTagFilter ? List.of("__dummy__") : tagNames;
+
+            boolean noFilters=(search==null || search.isEmpty())
+                    &&(authorName==null || authorName.isEmpty())
+                    && skipTagFilter;
+
             pageResultsPostEntities = postRepository.findFilteredPosts(
-//                    search, authorName, safeTagNames, skipTagFilter,sort
-                      search, authorName, safeTagNames, skipTagFilter,pageable
+                      search, authorName, safeTagNames, skipTagFilter,
+                    startDateTime,endDateTime,pageable
             );
-        }
         List<PostDto> postDtos = entityToDtoConvertorViceVersa
                 .postEntityToDto(pageResultsPostEntities.getContent());
 
@@ -145,5 +142,13 @@ public class PostService {
         result.put("totalPages", pageResultsPostEntities.getTotalPages());
         result.put("totalItems", pageResultsPostEntities.getTotalElements());
         return result;
+    }
+
+    public List<String> getAllAuthors(){
+        return postRepository.findAllDistinctAuthors();
+
+    }
+    public List<String> getAllTags(){
+        return postRepository.finAllDistinctTags();
     }
 }

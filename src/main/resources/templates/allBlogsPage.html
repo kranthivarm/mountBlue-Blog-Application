@@ -63,18 +63,18 @@
     </table>
 
     <!-- Pagination -->
-    <div style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;">
+    <div th:if="${totalPages>0}" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;">
 
         <!-- Previous -->
         <a th:if="${currentPage > 0}"
-           th:href="@{/blogPost/allblogs(page=${currentPage - 1}, search=${search}, authorName=${authorName}, tagNames=${tagNames}, sortField=${sortField}, order=${order})}"
+           th:href="@{/blogPost/allblogs(page=${currentPage - 1}, search=${search}, authorName=${authorName}, tagNames=${tagNames}, sortField=${sortField}, order=${order}, startDate=${startDate}, endDate=${endDate})}"
            style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none;">
             &laquo; Prev
         </a>
 
         <!-- Page numbers -->
         <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-            <a th:href="@{/blogPost/allblogs(page=${i}, search=${search}, authorName=${authorName}, tagNames=${tagNames}, sortField=${sortField}, order=${order})}"
+            <a th:href="@{/blogPost/allblogs(page=${i}, search=${search}, authorName=${authorName}, tagNames=${tagNames}, sortField=${sortField}, order=${order}, startDate=${startDate}, endDate=${endDate})}"
                th:text="${i + 1}"
                th:style="${i == currentPage} ? 'padding:6px 12px; border:1px solid #3498db; border-radius:4px; background:#3498db; color:white; text-decoration:none;'
                                         : 'padding:6px 12px; border:1px solid #ccc; border-radius:4px; text-decoration:none;'">
@@ -83,7 +83,7 @@
 
         <!-- Next -->
         <a th:if="${currentPage < totalPages - 1}"
-           th:href="@{/blogPost/allblogs(page=${currentPage + 1}, search=${search}, authorName=${authorName}, tagNames=${tagNames}, sortField=${sortField}, order=${order})}"
+           th:href="@{/blogPost/allblogs(page=${currentPage + 1}, search=${search}, authorName=${authorName}, tagNames=${tagNames}, sortField=${sortField}, order=${order}, startDate=${startDate}, endDate=${endDate})}"
            style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none;">
             Next &raquo;
         </a>

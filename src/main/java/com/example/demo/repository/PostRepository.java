@@ -3,12 +3,12 @@ package com.example.demo.repository;
 import com.example.demo.entities.PostEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -28,15 +28,22 @@ public Page<PostEntity> findAllByOrderByPublishedAtDesc(Pageable pageable);
             LOWER(p.author)  LIKE LOWER(CONCAT('%', :search, '%')) OR
             LOWER(t.name)    LIKE LOWER(CONCAT('%', :search, '%'))
           )
-      AND (:authorName is null or :authorName = '' or p.author = :authorName)
+      And (:authorName is null or :authorName = '' or p.author = :authorName)
       And (:skipTagFilter = true OR t.name IN :tagNames)
+      And p.publishedAt>= :startDate
+      And p.publishedAt<= :endDate
       """)
     public Page<PostEntity> findFilteredPosts(
             @Param("search") String search,
             @Param("authorName") String authorName,
             @Param("tagNames") List<String> tagNames,
             @Param("skipTagFilter") boolean skipTagFilter,
-//            Sort sort
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
             Pageable pageable
     );
+    @Query("select distinct p.author from PostEntity p where p.author is not null")
+    List<String> findAllDistinctAuthors();
+    @Query("select distinct t.name from TagEntity t")
+    List<String> finAllDistinctTags();
 }

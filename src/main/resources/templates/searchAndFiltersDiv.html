@@ -33,13 +33,18 @@
             border-top: 1px solid #eee;
             padding-top: 15px;
         }
-        .sf-filter-row input[type="text"] {
+        .sf-filter-row input[type="date"] {
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .sf-author-input { width: 100px; }
-        .sf-tags-input  { width: 160px; }
+        .sf-date-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #555;
+        }
         .sf-sort-row {
             display: flex;
             gap: 5px;
@@ -68,11 +73,85 @@
             color: #666;
             font-size: 13px;
         }
+
+        /* Dropdown styles */
+        .dd-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dd-btn {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            min-width: 130px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #333;
+            user-select: none;
+        }
+        .dd-btn:hover { border-color: #3498db; }
+        .dd-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 200px;
+            z-index: 200;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .dd-panel.open { display: block; }
+        .dd-search {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-bottom: 1px solid #eee;
+            border-radius: 4px 4px 0 0;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .dd-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .dd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .dd-item:hover { background: #f0f7ff; }
+        .dd-item input { width: auto; margin: 0; cursor: pointer; }
+        .dd-empty {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #999;
+        }
+        .dd-badge {
+            background: #3498db;
+            color: white;
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .dd-arrow { font-size: 10px; color: #888; }
     </style>
 
     <div class="sf-wrapper">
         <form th:action="@{/blogPost/allblogs}" method="get" id="mainForm">
 
+<!--            search Bar-->
             <div class="sf-search-row">
                 <input type="text" name="search" id="searchInput"
                        placeholder="Search posts..."
@@ -83,18 +162,86 @@
                 </button>
             </div>
 
+            <!-- Filter Div -->
             <div class="sf-filter-row">
 
-                <input type="text" name="authorName"
-                       placeholder="AuthorName"
-                       th:value="${param.authorName}"
-                       class="sf-author-input" />
+<!--                Author-->
+                <div class="dd-wrapper" id="dd-author">
+                    <div class="dd-btn" onclick="toggleDd('dd-author')">
+                        <span id="dd-author-label">
+                            <span th:if="${selectedAuthor != null and !#strings.isEmpty(selectedAuthor)}"
+                                  th:text="${selectedAuthor}"></span>
+                            <span th:if="${selectedAuthor == null or #strings.isEmpty(selectedAuthor)}">Author</span>
+                            <span class="dd-badge"
+                                  th:if="${selectedAuthor != null and !#strings.isEmpty(selectedAuthor)}">1</span>
+                        </span>
+                        <span class="dd-arrow">&#9660;</span>
+                    </div>
+                    <div class="dd-panel" id="dd-author-panel">
+                        <input type="text" class="dd-search"
+                               placeholder="Search authors..."
+                               oninput="filterDdItems('dd-author', this.value)" />
+                        <div class="dd-list" id="dd-author-list">
+                            <!-- Clear option -->
+                            <div class="dd-item" onclick="clearAuthor()">
+                                <span style="color:#e74c3c; font-size:13px;">&#10005; Clear</span>
+                            </div>
+                            <div th:each="author : ${allAuthors}" class="dd-item dd-option">
+                                <input type="radio" name="authorName"
+                                       th:value="${author}"
+                                       th:checked="${selectedAuthor != null and selectedAuthor == author}"
+                                       onchange="updateAuthorLabel(this)" />
+                                <span th:text="${author}"></span>
+                            </div>
+                            <div class="dd-empty" style="display:none" id="dd-author-empty">No results</div>
+                        </div>
+                    </div>
+                </div>
 
-                <input type="text" name="tagNames"
-                       placeholder="TagNames separated by ','"
-                       th:value="${param.tagNames}"
-                       class="sf-tags-input" />
+                <!-- Tags dropDown -->
+                <div class="dd-wrapper" id="dd-tags">
+                    <div class="dd-btn" onclick="toggleDd('dd-tags')">
+                        <span id="dd-tags-label">
+                            Tags
+                            <span class="dd-badge"
+                                  th:if="${selectedTagsList != null and !selectedTagsList.isEmpty()}"
+                                  th:text="${selectedTagsList.size()}"></span>
+                        </span>
+                        <span class="dd-arrow">&#9660;</span>
+                    </div>
+                    <div class="dd-panel" id="dd-tags-panel">
+                        <input type="text" class="dd-search"
+                               placeholder="Search tags..."
+                               oninput="filterDdItems('dd-tags', this.value)" />
+                        <div class="dd-list" id="dd-tags-list">
+                            <div class="dd-item" onclick="clearTags()">
+                                <span style="color:#e74c3c; font-size:13px;">&#10005; Clear all</span>
+                            </div>
+                            <div th:each="tag : ${allTags}" class="dd-item dd-option">
+                                <input type="checkbox" name="tagNames"
+                                       th:value="${tag}"
+                                       th:checked="${selectedTagsList != null and selectedTagsList.contains(tag)}"
+                                       onchange="updateTagsBadge()" />
+                                <span th:text="${tag}"></span>
+                            </div>
+                            <div class="dd-empty" style="display:none" id="dd-tags-empty">No results</div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Dates -->
+                <label class="sf-date-label">
+                    From
+                    <input type="date" name="startDate"
+                           th:value="${param.startDate != null and param.startDate != '' ? param.startDate : '1900-01-01'}" />
+                </label>
+                <label class="sf-date-label">
+                    To
+                    <input type="date" name="endDate"
+                           th:value="${param.endDate != null and param.endDate != '' ? param.endDate : #dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
+                </label>
+
+                <!-- Sort fields-->
                 <div class="sf-sort-row">
                     <select name="sortField">
                         <option value="publishedAt" th:selected="${param.sortField == 'publishedAt'}">Published</option>
@@ -110,12 +257,64 @@
                     <button type="submit" class="sf-apply-btn">Apply Filters</button>
                     <a th:href="@{/blogPost/allblogs}" class="sf-clear-link">Clear All</a>
                 </div>
-
             </div>
         </form>
     </div>
 
     <script>
+        // Toggle dropdown open/close
+        function toggleDd(id) {
+            const panel = document.getElementById(id + '-panel');
+            document.querySelectorAll('.dd-panel.open').forEach(p => {
+                if (p !== panel) p.classList.remove('open');
+            });
+            panel.classList.toggle('open');
+        }
+
+        // Filter items inside a dropdown by search text
+        function filterDdItems(ddId, query) {
+            const list    = document.getElementById(ddId + '-list');
+            const empty   = document.getElementById(ddId + '-empty');
+            const options = list.querySelectorAll('.dd-option');
+            const q       = query.toLowerCase();
+            let visible   = 0;
+            options.forEach(item => {
+                const text = item.querySelector('span').textContent.toLowerCase();
+                const show = text.includes(q);
+                item.style.display = show ? 'flex' : 'none';
+                if (show) visible++;
+            });
+            empty.style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        // Author: radio — update label on select
+        function updateAuthorLabel(radio) {
+            document.getElementById('dd-author-label').innerHTML =
+                radio.value + ' <span class="dd-badge">1</span>';
+        }
+
+        function clearAuthor() {
+            document.querySelectorAll('input[name="authorName"]')
+                    .forEach(r => r.checked = false);
+            document.getElementById('dd-author-label').innerHTML = 'Author';
+            document.getElementById('dd-author-panel').classList.remove('open');
+        }
+
+        // Tags: checkboxes — update badge count
+        function updateTagsBadge() {
+            const count = document.querySelectorAll('input[name="tagNames"]:checked').length;
+            document.getElementById('dd-tags-label').innerHTML =
+                'Tags' + (count > 0 ? ' <span class="dd-badge">' + count + '</span>' : '');
+        }
+
+        function clearTags() {
+            document.querySelectorAll('input[name="tagNames"]')
+                    .forEach(c => c.checked = false);
+            document.getElementById('dd-tags-label').innerHTML = 'Tags';
+            document.getElementById('dd-tags-panel').classList.remove('open');
+        }
+
+        // Search button: only submit the search field
         function submitSearchOnly() {
             const form = document.getElementById('mainForm');
             form.querySelectorAll('input, select').forEach(el => {
@@ -126,5 +325,13 @@
                 el.disabled = false;
             });
         }
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dd-wrapper')) {
+                document.querySelectorAll('.dd-panel.open')
+                        .forEach(p => p.classList.remove('open'));
+            }
+        });
     </script>
 </div>
