@@ -12,7 +12,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "tags")
+@Table(
+        name = "tags",
+        indexes = {
+                @Index(name="index_tag_name",columnList = "name",unique = true)
+        }
+)
 @Data
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -20,6 +25,7 @@ public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false)
     private String name;
 
     @CreatedDate
@@ -29,7 +35,7 @@ public class TagEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags",fetch = FetchType.LAZY)
     @ToString.Exclude// circurlar reference
     private List<PostEntity>posts;
 }

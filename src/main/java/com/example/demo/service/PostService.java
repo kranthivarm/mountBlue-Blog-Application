@@ -32,31 +32,23 @@ public class PostService {
     }
 
     public List<PostDto> findAll(){
-        List<PostEntity>postEntities=postRepository.findAll();
-        List<PostDto>postDtos=new ArrayList<>();
-        for(PostEntity entity: postEntities){
-            postDtos.add(
-                 entityToDtoConvertorViceVersa.postEntityToDto(entity)
-//                modelMapper.map(entity, PostDto.class)
-            );
-        }
-        return postDtos;
+//        List<PostEntity>postEntities=postRepository.findAll();
+        List<PostEntity>postEntities=postRepository.findAllWithTags();
+        return entityToDtoConvertorViceVersa.postEntityToDto(postEntities);
     }
 
     public PostDto findById(int id) {
-//        return modelMapper.map(postRepository.findById(id),PostModel.class);
-        PostEntity postEntity=postRepository.findById(id).orElse(null);
+//        PostEntity postEntity=postRepository.findById(id).orElse(null);
+        PostEntity postEntity=postRepository.findByIdWithTags(id).orElse(null);
         if(postEntity==null)return null;
-//        PostDto postDto =modelMapper.map(postEntity, PostDto.class);
-//
-////        String tagString=String.join(',',postEntity.getTags());
-//        StringBuilder tagStr=new StringBuilder("");
-//        for(TagEntity tagEntity: postEntity.getTags()){
-//            tagStr.append(tagEntity.getName()+",");
-//        }
-//        postDto.setTags(tagStr.toString());
         return entityToDtoConvertorViceVersa.postEntityToDto(postEntity);
     }
+//    public PostDto findByIdWithTags(int id) {
+////        PostEntity postEntity=postRepository.findById(id).orElse(null);
+//        PostEntity postEntity=postRepository.findByIdWithTags(id).orElse(null);
+//        if(postEntity==null)return null;
+//        return entityToDtoConvertorViceVersa.postEntityToDto(postEntity);
+//    }
 
     @Transactional
     public PostDto createNewPost(PostDto postDto){
@@ -124,9 +116,9 @@ public class PostService {
             boolean skipTagFilter = (tagNames == null || tagNames.isEmpty());
             List<String> safeTagNames = skipTagFilter ? List.of("__dummy__") : tagNames;
 
-            boolean noFilters=(search==null || search.isEmpty())
-                    &&(authorName==null || authorName.isEmpty())
-                    && skipTagFilter;
+//            boolean noFilters=(search==null || search.isEmpty())
+//                    &&(authorName==null || authorName.isEmpty())
+//                    && skipTagFilter;
 
             pageResultsPostEntities = postRepository.findFilteredPosts(
                       search, authorName, safeTagNames, skipTagFilter,

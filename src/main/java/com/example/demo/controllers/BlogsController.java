@@ -6,6 +6,7 @@ import com.example.demo.dtos.PostDto;
 import com.example.demo.service.CommentService;
 import com.example.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,21 +35,32 @@ public class BlogsController {
     }
     //creation of new blog post
     @GetMapping("/blogCreationForm")
-    public String postFormForNewPost(Model model){
+    public String postFormForNewPost(Model model, Authentication auth){
         System.out.println("creation form controller");
-        model.addAttribute("post",new PostDto());
+
+        PostDto postDto=new PostDto();
+//        postDto.setAuthor(auth.getName());//author/admin name
+        if(!hasRole(auth,"ADMIN")){
+            postDto.setAuthor(auth.getName());
+        }
+        model.addAttribute("post",postDto);
+        model.addAttribute("isAdmin",hasRole(auth,"ADMIN"));
+
         return "blogCreationForm";
     }
 
     @PostMapping("/newPost")
-    public  String createNewPost(@ModelAttribute PostDto postDto, Model model){
+    public  String createNewPost(@ModelAttribute PostDto postDto, Model model,Authentication auth){
         System.out.println(" new post controller");
+
+        if(!hasRole(auth,"ADMIN"))postDto.setAuthor(auth.getName());
+
         PostDto insertedInstance = postService.createNewPost(postDto);
         if(insertedInstance!=null){
             //redirecting to singlePOstPost
             return "redirect:/blogPost/"+insertedInstance.getId();
         }
-        else return "redirect:/blogPost/blogCreationForm";
+         return "redirect:/blogPost/blogCreationForm";
     }
 
     //all blogs + sorting // sortField="publishedAt"&order="asc"
@@ -62,7 +74,8 @@ public class BlogsController {
             @RequestParam(required = false, value="order",defaultValue = "desc")String order,
             @RequestParam(required = false,defaultValue = "1900-01-01")String startDate,
             @RequestParam(required = false)String endDate,
-            @RequestParam(required = false, defaultValue = "0") int page
+            @RequestParam(required = false, defaultValue = "0") int page,
+            Authentication auth
     ){
         System.out.println("allBlogs controller"+search+authorName+tagNames);
         page=Math.max(0,page);
@@ -74,8 +87,6 @@ public class BlogsController {
         model.addAttribute("allTags",postService.getAllTags());
 
         List<String>selectedTagsList=(tagNames!=null)?tagNames:new ArrayList<>();
-//        if(tagNames!=null && !tagNames.isEmpty())selectedTagsList=Arrays.asList(tagNames.split(","));
-//        else selectedTagsList=new ArrayList<>();
         List<PostDto>postDtos;
 
         Map<String, Object> result =postService.getFilteredPosts(
@@ -94,6 +105,11 @@ public class BlogsController {
         model.addAttribute("startDate",startDate);
         model.addAttribute("endDate",endDate);
 
+        if(auth!=null){
+            model.addAttribute("currentUserEmail",auth.getName());
+            model.addAttribute("isAdmin",hasRole(auth,"ADMIN"));
+            model.addAttribute("isUser",hasRole(auth,"USER"));
+        }
         return "allBlogsPage";
     }
 
@@ -102,11 +118,10 @@ public class BlogsController {
     public  String viewPost(
             @PathVariable int postId,
             @RequestParam(defaultValue = "0")int commentPage,
-            @RequestParam(value = "commentId", defaultValue = "-1") int commentId,
-            Model model
+            @RequestParam(value = "commentId", defaultValue = "-1") int commentId,//this is for comment update
+            Model model,
+            Authentication auth
     ){
-
-
         System.out.println("single page controller");
 
         PostDto postDto=postService.findById(postId);
@@ -117,32 +132,64 @@ public class BlogsController {
         model.addAttribute("commentTotalPages", commentResult.getTotalPages());
         model.addAttribute("updateCommentId",commentId);
         model.addAttribute("commentTotalItems", commentResult.getTotalItems());
+
+        if(auth !=null){
+            model.addAttribute("currentUserEmail",auth.getName());
+            model.addAttribute("isAdmin",hasRole(auth,"ADMIN"));
+            model.addAttribute("isUser",hasRole(auth,"USER"));
+            model.addAttribute("isOwner", postDto.getAuthor().equals(auth.getName()));
+            model.addAttribute("updateCommentId",commentId);
+        }
         return "singlePostPage";
     }
 
     @GetMapping("/updatePostForm/{id}")
-    public  String updatePostForm(@PathVariable String id, Model model){
+    public  String updatePostForm(@PathVariable int id, Model model,Authentication auth){
         System.out.println("updateForm ctrlr");
-        model.addAttribute("post",postService.findById(Integer.parseInt(id)));
+        PostDto postDto=postService.findById(id);
+        if(!canModifyPost(auth,postDto)){
+            return "redirect:/blogPost/"+id+ "?error=unauthorized";
+        }
+        model.addAttribute("post",postDto);
+        model.addAttribute("isAdmin",hasRole(auth,"ADMIN"));
         return "updatePostForm";
     }
 
     @PostMapping("/update")
-    public String updateBlogPost(@ModelAttribute PostDto postDto){
-        System.out.println(
-                "updatePost ctrlr"+
-                postDto.getTitle()+
-                (postDto.getTags())
-        );
+    public String updateBlogPost(@ModelAttribute PostDto postDto, Authentication auth){
+        System.out.println("updatePost ctrlr"+ postDto.getTitle()+ (postDto.getTags()));
+        PostDto existing = postService.findById(postDto.getId());
+        if (!canModifyPost(auth, existing))
+            return "redirect:/blogPost/" + postDto.getId() + "?error=unauthorized";
+        if (!hasRole(auth, "ADMIN")) {
+            postDto.setAuthor(auth.getName());
+        }
         postService.updatePost(postDto);
         return "redirect:/blogPost/"+ postDto.getId();
     }
 
     //    @DeleteMapping("/deletePost/{id}")//browsers not supporting but we can
     @GetMapping("/deletePost/{id}")
-    public String deletePost(@PathVariable String id){
+    public String deletePost(@PathVariable int id,Authentication auth){
         System.out.println("deleteBy Id Ctrlr");
-        postService.deleteById(Integer.parseInt(id));
+
+        PostDto post = postService.findById(id);
+        if (!canModifyPost(auth, post)) return "redirect:/blogPost/" + id + "?error=unauthorized";
+
+        postService.deleteById(id);
         return "redirect:/blogPost/allblogs";
+    }
+
+    private boolean hasRole(Authentication auth, String role) {
+        if (auth == null) return false;
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
+    }
+
+    private boolean canModifyPost(Authentication auth, PostDto post) {
+        if (auth == null) return false;
+        if (hasRole(auth, "ADMIN")) return true;
+        // AUTHOR can only modify their own posts
+        return hasRole(auth, "USER") && post.getAuthor().equals(auth.getName());
     }
 }

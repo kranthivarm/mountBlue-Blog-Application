@@ -28,7 +28,7 @@ public class EntityToDtoConvertorViceVersa {
         this.tagRepository=tagRepository;
         this.postRepository=postRepository;
     }
-
+    @Transactional
     public Set<TagEntity> tagDtosToEntities(String tagsString){
         Set<TagEntity> tags = new HashSet<>();
         if(tagsString == null || tagsString.trim().isEmpty()){
@@ -63,6 +63,7 @@ public class EntityToDtoConvertorViceVersa {
         if(!tags.isEmpty())tags.deleteCharAt(tags.length() - 1);
         postDto.setTags(tags.toString());
 
+        //commented because of pageNation
         //comments
 //        List<CommentDto> commentDtos=
 //                postEntity.getComments()
@@ -77,6 +78,7 @@ public class EntityToDtoConvertorViceVersa {
         postDto.setComments(new ArrayList<>());
         return postDto;
     }
+
     public List<PostDto> postEntityToDto(List<PostEntity> postEntities){
         List<PostDto>postDtos=new ArrayList<>();
         for(PostEntity postEntity:postEntities){
@@ -92,11 +94,15 @@ public class EntityToDtoConvertorViceVersa {
         newPostEntity.setComments(commentsEntities);
         return newPostEntity;
     }
+    @Transactional
     public PostEntity postDtoToEntity(PostDto postDto){
         //converting model to entity without Tags
 
-        PostEntity existingPostEntity = postRepository.findById(postDto.getId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+//        PostEntity existingPostEntity = postRepository.findById(postDto.getId())
+//                .orElseThrow(() -> new RuntimeException("Post not found"));
+        PostEntity existingPostEntity=postRepository.findByIdWithTags(postDto.getId())
+                .orElseThrow(()->new RuntimeException("Post Not found"));
+        //comments already came from db;
         existingPostEntity.setTitle(postDto.getTitle());
         existingPostEntity.setExcerpt(postDto.getExcerpt());
         existingPostEntity.setContent(postDto.getContent());

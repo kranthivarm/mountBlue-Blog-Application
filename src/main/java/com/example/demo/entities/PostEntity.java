@@ -14,7 +14,13 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "posts")
+@Table(
+    name = "posts",
+    indexes = {
+         @Index(name = "index_post_author",columnList = "author"),
+         @Index(name = "index_post_published_at",columnList = "publishedAt")
+    }
+)
 @Data
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -38,7 +44,7 @@ public class PostEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
          name="PostTags",
          joinColumns = @JoinColumn(name="postId"),

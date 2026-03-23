@@ -2,6 +2,7 @@
 <html
     lang="en"
     xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 >
 <head>
     <meta charset="UTF-8">
@@ -82,8 +83,14 @@
                 <input type="text" id="excerpt" th:field="*{excerpt}" placeholder="Short summary...">
 
             <br>
-                <label for="author">Author</label>
-                <input type="text" id="author" th:field="*{author}" placeholder="Author name...">
+                <label >Author</label>
+                <input
+                        type="text" name="author" th:field="*{author}" placeholder="Author name..."
+                        th:disabled="${!isAdmin}"
+                        th:classappend="${!isAdmin} ? 'readonly-field'"
+<!--                        th:readonly="${!isAdmin}"-->
+                >
+                <input type="hidden" name="author" th:field="*{author}" th:if="${!isAdmin}" />
             <br>
 <!--            adding tags-->
                 <label for="tags"></label>

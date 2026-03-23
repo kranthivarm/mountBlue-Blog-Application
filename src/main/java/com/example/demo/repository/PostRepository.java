@@ -10,11 +10,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<PostEntity,Integer> {
-//    public List<PostEntity> findAllByOrderByPublishedAtAsc();
-//    public List<PostEntity> findAllByOrderByPublishedAtDesc();
 public Page<PostEntity> findAllByOrderByPublishedAtAsc(Pageable pageable);
 public Page<PostEntity> findAllByOrderByPublishedAtDesc(Pageable pageable);
     @Query("""
@@ -42,8 +41,15 @@ public Page<PostEntity> findAllByOrderByPublishedAtDesc(Pageable pageable);
             @Param("endDate") LocalDateTime endDate,
             Pageable pageable
     );
+
+    @Query("select DISTINCT p from PostEntity p Left Join FETCH p.tags")
+    public List<PostEntity>findAllWithTags();
+
+    @Query("select distinct p from PostEntity p left JOIN Fetch p.tags where p.id=:id")
+    public Optional<PostEntity> findByIdWithTags(@Param("id") int id);
+
     @Query("select distinct p.author from PostEntity p where p.author is not null")
-    List<String> findAllDistinctAuthors();
+    public List<String> findAllDistinctAuthors();
     @Query("select distinct t.name from TagEntity t")
-    List<String> finAllDistinctTags();
+    public List<String> finAllDistinctTags();
 }

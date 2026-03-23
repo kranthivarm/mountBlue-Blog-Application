@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single Post</title>
     <style>
         .fixedButton{
-             width:60px;
-             height:40px;
-             background-color:lightpink;
-             border-radius:50%;
-             border:2px solid black;
-             display:flex;
-             align-items:center;
-             justify-content:center;
+                width: 75px;
+                height: 40px;
+                background-color: #007bff;
+                color:white;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
         }
         body {
             font-family: Arial, sans-serif;
@@ -84,6 +87,8 @@
     </style>
 </head>
 <body >
+    <div th:replace="~{fragments/reloadToAvoidCache::freshPageScript}"></div>
+
 <!--    delete button  -->
 <!--<div style="-->
 <!--         position:fixed;-->
@@ -96,20 +101,22 @@
 <!--    >Delete</a>-->
 <!--</div>-->
     <a
+        th:if="${isAdmin or (isUser and isOwner)}"
         th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
         style="text-decoration:none; color:black;"
     ><div style="
-         position:fixed;
+         position:absolute;
          top:10px;
          right:20px;
     " class="fixedButton">Delete</div></a>
 <!--    updatebutton-->
 
     <a
-            th:href="@{/blogPost/updatePostForm/{id}(id=${post.id})}"
-            style="text-decoration:none; color:black;"
+        th:if="${isAdmin or (isUser and isOwner)}"
+        th:href="@{/blogPost/updatePostForm/{id}(id=${post.id})}"
+        style="text-decoration:none; color:black;"
     ><div class="fixedButton" style="
-             position:fixed;
+             position:absolute;
              top:10px;
              right:150px;
         ">Edit</div></a>
@@ -167,13 +174,13 @@
                         <span th:text="${#temporals.format(comment.createdAt,'MMM dd yyyy HH:mm')}"></span>
                     </span>
                 <div style="display: flex; gap: 5px;">
-                    <div class="commentButton">
+                    <div class="commentButton" th:if="${isAdmin or (isUser and isOwner)}">
                         <a
-                                th:href="@{/blogPost/{postId}(postId=${comment.postId}, commentId=${comment.id}, commentPage=${commentCurrentPage})}"
-                                style="text-decoration:none; color:black;"
+                            th:href="@{/blogPost/{postId}(postId=${comment.postId}, commentId=${comment.id}, commentPage=${commentCurrentPage})}"
+                            style="text-decoration:none; color:black;"
                         >Edit</a>
                     </div>
-                    <div class="commentButton">
+                    <div class="commentButton" th:if="${isAdmin or (isUser and isOwner)}">
                         <a
                                 th:href="@{/comments/deleteComment(commentId=${comment.id},postId=${comment.postId})}"
                                 style="text-decoration:none; color:red;"

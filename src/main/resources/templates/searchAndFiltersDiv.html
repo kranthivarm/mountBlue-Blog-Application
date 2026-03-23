@@ -232,13 +232,15 @@
                 <!-- Dates -->
                 <label class="sf-date-label">
                     From
-                    <input type="date" name="startDate"
-                           th:value="${param.startDate != null and param.startDate != '' ? param.startDate : '1900-01-01'}" />
+                    <input type="date" name="startDate"/>
+<!--                           th:value="${param.startDate != null and param.startDate != '' ? param.startDate : '1900-01-01'}" -->
+
                 </label>
                 <label class="sf-date-label">
                     To
-                    <input type="date" name="endDate"
-                           th:value="${param.endDate != null and param.endDate != '' ? param.endDate : #dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
+                    <input type="date" name="endDate"/>
+<!--                           th:value="${param.endDate != null and param.endDate != '' ? param.endDate : #dates.format(#dates.createNow(), 'yyyy-MM-dd')}" -->
+
                 </label>
 
                 <!-- Sort fields-->

@@ -1,4 +1,4 @@
-<div th:fragment="newPostBtnFragment">
+<div th:fragment="logoutBtnFrag">
     <style>
         .buttonDiv{
             height: 30px;
@@ -18,7 +18,10 @@
             margin: 5px;
         }
     </style>
-    <a th:href="@{/blogPost/blogCreationForm}">
-        <div class="buttonDiv">createPost</div>
-    </a>
+<!--    <a th:href="@{/auth/logout}">-->
+<!--        <div class="buttonDiv">Logout</div>-->
+<!--    </a>-->
+    <form th:action="@{/auth/logout}" method="post">
+        <button type="submit" class="buttonDiv">Logout</button>
+    </form>
 </div>

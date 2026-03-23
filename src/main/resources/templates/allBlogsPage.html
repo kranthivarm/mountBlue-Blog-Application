@@ -2,6 +2,7 @@
 <html
       lang="en"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 >
 <head>
     <meta charset="UTF-8">
@@ -25,7 +26,7 @@
 <!--    <div th:replace="~{sortButton::sortingButton}"></div>-->
     <table border="1" >
         <thead>
-        <tr style="background-color: grey;">
+        <tr style="background-color: #3498db;">
             <th>Title</th>
             <th>Excerpt</th>
             <th>Author</th>
@@ -49,12 +50,14 @@
             <td th:text="${post?.publishedAt ?: 'No Date'}">Published At</td>
             <td>
                 <a
+                  th:if="${isAdmin or (isUser and post.author==currentUserEmail)}"
                   th:href="@{/blogPost/updatePostForm/{id}(id=${post.id})}"
                 >UpdateThispost
                 </a>
             </td>
             <td>
                 <a
+                   th:if="${isAdmin or (isUser and post.author == currentUserEmail)}"
                    th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
                 >DeleteThisBlog</a>
             </td>
