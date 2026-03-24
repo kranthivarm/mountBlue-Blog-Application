@@ -40,7 +40,7 @@ public class BlogsController {
 
         PostDto postDto=new PostDto();
 //        postDto.setAuthor(auth.getName());//author/admin name
-        if(!hasRole(auth,"ADMIN")){
+        if(!hasRole(auth,"ADMIN")){//default is User so assigning Admin
             postDto.setAuthor(auth.getName());
         }
         model.addAttribute("post",postDto);
@@ -53,12 +53,26 @@ public class BlogsController {
     public  String createNewPost(@ModelAttribute PostDto postDto, Model model,Authentication auth){
         System.out.println(" new post controller");
 
+        //non Admin
         if(!hasRole(auth,"ADMIN"))postDto.setAuthor(auth.getName());
+        else {
+            // when author provided is null or empty
+            if (postDto.getAuthor() == null || postDto.getAuthor().isBlank()) {
+                postDto.setAuthor(auth.getName()); //  admin email as author
+            }
+        }
 
-        PostDto insertedInstance = postService.createNewPost(postDto);
-        if(insertedInstance!=null){
-            //redirecting to singlePOstPost
-            return "redirect:/blogPost/"+insertedInstance.getId();
+        try {
+            PostDto insertedInstance = postService.createNewPost(postDto);
+            if (insertedInstance != null) {
+                //redirecting to singlePOstPost
+                return "redirect:/blogPost/" + insertedInstance.getId();
+            }
+        }catch (Exception e){
+            model.addAttribute("post", postDto);
+            model.addAttribute("isAdmin", true);
+            model.addAttribute("error", e.getMessage());
+            return "blogCreationForm";
         }
          return "redirect:/blogPost/blogCreationForm";
     }

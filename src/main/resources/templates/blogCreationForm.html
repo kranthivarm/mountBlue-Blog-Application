@@ -83,14 +83,36 @@
                 <input type="text" id="excerpt" th:field="*{excerpt}" placeholder="Short summary...">
 
             <br>
-                <label >Author</label>
-                <input
-                        type="text" name="author" th:field="*{author}" placeholder="Author name..."
-                        th:disabled="${!isAdmin}"
-                        th:classappend="${!isAdmin} ? 'readonly-field'"
-<!--                        th:readonly="${!isAdmin}"-->
-                >
-                <input type="hidden" name="author" th:field="*{author}" th:if="${!isAdmin}" />
+                <div th:if="${isAdmin}">
+                    <label>Author Email</label>
+                    <input
+                            type="text"
+                            th:field="*{author}"
+                            placeholder="Existing author email"
+                    >
+<!--                    <small style="color:#ccc">Leave blank to assign post to yourself</small>-->
+                </div>
+
+                <!-- For regular USER: hidden input, show read-only display -->
+                <div th:if="${!isAdmin}">
+                    <label>Author</label>
+                    <input
+                            type="text"
+                            th:value="*{author}"
+                            disabled
+                            style="background:#eee; cursor:not-allowed;"
+                    >
+                    <input type="hidden" name="author" th:value="*{author}" />
+                </div>
+<!--                <label >Author</label>-->
+<!--                <input-->
+<!--                        type="text" name="author" th:field="*{author}" placeholder="Author name..."-->
+<!--                        th:disabled="${!isAdmin}"-->
+<!--                        th:classappend="${!isAdmin} ? 'readonly-field'"-->
+<!--                >-->
+<!--&lt;!&ndash;                        th:readonly="${!isAdmin}"&ndash;&gt;-->
+<!--&lt;!&ndash;                >&ndash;&gt;-->
+<!--                <input type="hidden" name="author" th:field="*{author}" th:if="${!isAdmin}" />-->
             <br>
 <!--            adding tags-->
                 <label for="tags"></label>

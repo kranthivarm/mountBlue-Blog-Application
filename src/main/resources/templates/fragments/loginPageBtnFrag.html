@@ -1,4 +1,4 @@
-<div th:fragment="newPostBtnFragment">
+<div th:fragment="loginPageBtnFrag">
     <style>
         .buttonDiv{
             height: 30px;
@@ -18,7 +18,7 @@
             margin: 5px;
         }
     </style>
-    <a class="anchorCssRemove" th:href="@{/blogPost/blogCreationForm}">
-        <div class="buttonDiv">createPost</div>
-    </a>
+        <a class="anchorCssRemove" th:href="@{/auth/login}">
+            <div class="buttonDiv">Login</div>
+        </a>
 </div>

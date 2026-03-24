@@ -20,6 +20,19 @@
     </style>
 </head>
 <body>
+    <div style="display: flex; justify-content: flex-end;">
+<!--        //create new blog post-->
+        <div sec:authorize="isAuthenticated()"
+            th:replace="~{fragments/btnFragCreateNewPost::newPostBtnFragment}">
+        </div>
+        <div sec:authorize="isAnonymous()"
+             th:replace="~{fragments/loginPageBtnFrag::loginPageBtnFrag}">
+        </div>
+        <div sec:authorize="isAuthenticated()"
+             th:replace="~{fragments/logoutBtnFrag::logoutBtnFrag}">
+        </div>
+    </div>
+    <br>
     <div th:replace="~{searchAndFiltersDiv::searchAndFilterFragment}"></div>
 
     <h1>All Posts<span></span></h1>

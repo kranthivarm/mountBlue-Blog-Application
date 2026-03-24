@@ -13,6 +13,10 @@ public class PostDto {
     private String excerpt;
     private String content;
     private String author;
+
+    private Integer userId;
+    private String authorName;
+
     private LocalDateTime publishedAt;
     private boolean isPublished;
     private LocalDateTime createdAt;

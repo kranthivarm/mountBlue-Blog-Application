@@ -11,7 +11,7 @@
             border: 2px solid #000;
             <!--            background-color:blue;-->
         }
-        a{
+        .anchorCssRemove{
             text-decoration: none;
             color: inherit;
             display: inline-block;
@@ -21,7 +21,7 @@
 <!--    <a th:href="@{/auth/logout}">-->
 <!--        <div class="buttonDiv">Logout</div>-->
 <!--    </a>-->
-    <form th:action="@{/auth/logout}" method="post">
+    <form class="anchorCssRemove" th:action="@{/auth/logout}" method="post">
         <button type="submit" class="buttonDiv">Logout</button>
     </form>
 </div>

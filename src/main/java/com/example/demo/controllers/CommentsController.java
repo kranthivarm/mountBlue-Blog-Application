@@ -32,7 +32,7 @@ public class CommentsController {
     @PostMapping("/updateComment")
     public String updateComment(@ModelAttribute CommentDto commentDto, Authentication auth){
         System.out.println("comment update ctrl"+commentDto);
-        if(!canModifyComment(auth,commentDto.getPostId())){
+        if(!canModifyComment(auth,commentDto.getPostId(),commentDto.getId())){
             return "redirect:/blogPost/" + commentDto.getPostId() + "?error=unauthorized";
         }
         commentService.updateComment(commentDto);
@@ -46,18 +46,21 @@ public class CommentsController {
          Authentication auth
     ){
         System.out.println("Comment delete cntrl");
-        if(!canModifyComment(auth,postId)){
+        if(!canModifyComment(auth,postId,commentId)){
             return "redirect:/blogPost/" + postId + "?error=unauthorized";
         }
         commentService.deleteCommentBycommentId(commentId);
         return "redirect:/blogPost/"+postId;
     }
 
-    private boolean canModifyComment(Authentication auth, int postId) {
+    private boolean canModifyComment(Authentication auth, int commentId, int postId) {
         if (auth == null) return false;
         if (hasRole(auth, "ADMIN")) return true;
-        PostDto post = postService.findById(postId);
-        return post.getAuthor().equals(auth.getName());
+
+        CommentDto comment = commentService.findByCommentId(commentId);
+        return comment != null && comment.getEmail().equals(auth.getName());
+//        PostDto post = postService.findById(postId);
+//        return post.getAuthor().equals(auth.getName());
     }
     private boolean hasRole(Authentication auth, String role) {
         return auth.getAuthorities().stream()

@@ -7,6 +7,8 @@ import com.example.demo.entities.PostEntity;
 import com.example.demo.entities.TagEntity;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.TagRepository;
+import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,17 +19,14 @@ import java.util.stream.Collectors;
 
 
 @Component
+@RequiredArgsConstructor
 public class EntityToDtoConvertorViceVersa {
     private  final ModelMapper modelMapper;
     private  final TagRepository tagRepository;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    EntityToDtoConvertorViceVersa(ModelMapper mapper, TagRepository tagRepository,PostRepository postRepository){
-        this.modelMapper=mapper;
-        this.tagRepository=tagRepository;
-        this.postRepository=postRepository;
-    }
+
     @Transactional
     public Set<TagEntity> tagDtosToEntities(String tagsString){
         Set<TagEntity> tags = new HashSet<>();
@@ -107,6 +106,9 @@ public class EntityToDtoConvertorViceVersa {
         existingPostEntity.setExcerpt(postDto.getExcerpt());
         existingPostEntity.setContent(postDto.getContent());
         existingPostEntity.setAuthor(postDto.getAuthor());
+
+        userRepository.findByEmail(postDto.getAuthor())
+                .ifPresent(existingPostEntity::setUser);
 
         Set<TagEntity> tags = tagDtosToEntities(postDto.getTags());
         if(tags != null){

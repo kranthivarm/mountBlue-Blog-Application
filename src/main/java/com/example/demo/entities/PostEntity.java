@@ -3,6 +3,7 @@ package com.example.demo.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -54,6 +55,11 @@ public class PostEntity {
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<CommentsEntity> comments=new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id",nullable = false)
+    @ToString.Exclude
+    private UserEntity user;
 
     @PrePersist
     public void prePersist(){

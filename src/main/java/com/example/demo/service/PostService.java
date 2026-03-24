@@ -4,7 +4,10 @@ import com.example.demo.Utils.EntityToDtoConvertorViceVersa;
 import com.example.demo.entities.PostEntity;
 import com.example.demo.dtos.PostDto;
 import com.example.demo.entities.TagEntity;
+import com.example.demo.entities.UserEntity;
 import com.example.demo.repository.PostRepository;
+import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,18 +21,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final EntityToDtoConvertorViceVersa entityToDtoConvertorViceVersa;
-
-    @Autowired
-    public PostService(
-        PostRepository postRepository,
-        EntityToDtoConvertorViceVersa entityToDtoConvertorViceVersa
-    ){
-        this.postRepository=postRepository;
-        this.entityToDtoConvertorViceVersa = entityToDtoConvertorViceVersa;
-    }
+    private final UserRepository userRepository;
 
     public List<PostDto> findAll(){
 //        List<PostEntity>postEntities=postRepository.findAll();
@@ -53,6 +49,16 @@ public class PostService {
     @Transactional
     public PostDto createNewPost(PostDto postDto){
         PostEntity newPostEntity = entityToDtoConvertorViceVersa.postDtoToEntityCreate(postDto);
+
+        String authorEmail=
+                (postDto.getAuthor()==null ||postDto.getAuthor().isEmpty())
+                ?"":postDto.getAuthor();
+
+        Optional<UserEntity>userEntity=userRepository.findByEmail(postDto.getAuthor());
+        //seting user to post
+        if(userEntity.isPresent())newPostEntity.setUser(userEntity.get());
+        else throw  new RuntimeException("No User Found for this Post");
+
         //inserting entity
         PostEntity insertedEntity=postRepository.save(newPostEntity);
         //return model again;
@@ -79,18 +85,7 @@ public class PostService {
     }
 
     public void updatePost(PostDto postDto){
-//        PostEntity existing = postRepository.findById(postDto.getId())
-//                .orElseThrow(() -> new RuntimeException("Post not found"));
-//        existing.setTitle(postDto.getTitle());
-//        existing.setExcerpt(postDto.getExcerpt());
-//        existing.setContent(postDto.getContent());
-//        existing.setAuthor(postDto.getAuthor());
-//
-//        Set<TagEntity> tags = entityToDtoConvertorViceVersa.tagDtosToEntities(postDto.getTags());
-//        if(tags != null){
-//            existing.getTags().clear();
-//            existing.getTags().addAll(tags);
-//        }
+
         PostEntity existingPostEntity=entityToDtoConvertorViceVersa.postDtoToEntity(postDto);
         postRepository.save(existingPostEntity);
     }
