@@ -5,6 +5,7 @@ import com.example.demo.dtos.PostDto;
 import com.example.demo.entities.CommentsEntity;
 import com.example.demo.entities.PostEntity;
 import com.example.demo.entities.TagEntity;
+import com.example.demo.entities.UserEntity;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.TagRepository;
 import com.example.demo.repository.UserRepository;
@@ -107,8 +108,11 @@ public class EntityToDtoConvertorViceVersa {
         existingPostEntity.setContent(postDto.getContent());
         existingPostEntity.setAuthor(postDto.getAuthor());
 
-        userRepository.findByEmail(postDto.getAuthor())
-                .ifPresent(existingPostEntity::setUser);
+//        userRepository.findByEmail(postDto.getAuthor())
+//                .ifPresent(existingPostEntity::setUser);
+        Optional<UserEntity>userEntity =userRepository.findByEmail(postDto.getAuthor());
+        if(userEntity.isPresent())existingPostEntity.setUser(userEntity.get());
+        else throw new RuntimeException("User not found");
 
         Set<TagEntity> tags = tagDtosToEntities(postDto.getTags());
         if(tags != null){

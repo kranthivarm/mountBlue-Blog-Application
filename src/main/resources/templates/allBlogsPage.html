@@ -20,6 +20,7 @@
     </style>
 </head>
 <body>
+    <div th:replace="~{fragments/reloadToAvoidCache::freshPageScript}"></div>
     <div style="display: flex; justify-content: flex-end;">
 <!--        //create new blog post-->
         <div sec:authorize="isAuthenticated()"
@@ -63,15 +64,17 @@
             <td th:text="${post?.publishedAt ?: 'No Date'}">Published At</td>
             <td>
                 <a
-                  th:if="${isAdmin or (isUser and post.author==currentUserEmail)}"
+                  th:if="${(isAdmin ?: false) or ((isUser ?: false) and (post?.author != null and post.author == currentUserEmail))}"
                   th:href="@{/blogPost/updatePostForm/{id}(id=${post.id})}"
                 >UpdateThispost
                 </a>
             </td>
             <td>
                 <a
-                   th:if="${isAdmin or (isUser and post.author == currentUserEmail)}"
-                   th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
+                    th:if="${(isAdmin ?: false)
+                  or ((isUser ?: false)
+                  and (post?.author != null and post.author == currentUserEmail))}"
+                    th:href="@{/blogPost/deletePost/{id}(id=${post.id})}"
                 >DeleteThisBlog</a>
             </td>
         </tr>

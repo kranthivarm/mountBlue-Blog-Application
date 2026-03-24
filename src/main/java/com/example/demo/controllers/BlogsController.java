@@ -172,14 +172,19 @@ public class BlogsController {
     @PostMapping("/update")
     public String updateBlogPost(@ModelAttribute PostDto postDto, Authentication auth){
         System.out.println("updatePost ctrlr"+ postDto.getTitle()+ (postDto.getTags()));
-        PostDto existing = postService.findById(postDto.getId());
-        if (!canModifyPost(auth, existing))
-            return "redirect:/blogPost/" + postDto.getId() + "?error=unauthorized";
-        if (!hasRole(auth, "ADMIN")) {
-            postDto.setAuthor(auth.getName());
-        }
-        postService.updatePost(postDto);
-        return "redirect:/blogPost/"+ postDto.getId();
+            try {
+                PostDto existing = postService.findById(postDto.getId());
+                if (!canModifyPost(auth, existing))
+                    return "redirect:/blogPost/" + postDto.getId() + "?error=unauthorized";
+                if (!hasRole(auth, "ADMIN")) {
+                    postDto.setAuthor(auth.getName());
+                }
+                postService.updatePost(postDto);
+                return "redirect:/blogPost/" + postDto.getId();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+                return "redirect:/blogPost/updatePostForm/"+postDto.getId();
+            }
     }
 
     //    @DeleteMapping("/deletePost/{id}")//browsers not supporting but we can

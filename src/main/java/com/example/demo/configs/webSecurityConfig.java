@@ -52,6 +52,7 @@ public class webSecurityConfig {
                    .requestMatchers("/comments/updateComment",
                            "/comments/deleteComment"
                    ).authenticated()//needed acc to delete , update comment
+                   .requestMatchers("/error").permitAll()
                    .anyRequest().authenticated()
             )
             .formLogin(
@@ -71,8 +72,8 @@ public class webSecurityConfig {
                 .permitAll()
             )
             .sessionManagement(
-                    session ->session
-                    .maximumSessions(1)
+                session ->session
+                .maximumSessions(1)
             );
         return httpSecurity.build();
     }
