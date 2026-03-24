@@ -1,13 +1,17 @@
 package com.example.demo.restControllers;
 
+import com.example.demo.dtos.UserDto;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthRestController {
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+
 }
