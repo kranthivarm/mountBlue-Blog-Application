@@ -1,5 +1,6 @@
 package com.example.demo.configs;
 
+import com.example.demo.filters.JwtAuthfilter;
 import com.example.demo.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,12 +13,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class webSecurityConfig {
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final JwtAuthfilter jwtAuthfilter;
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -53,6 +56,36 @@ public class webSecurityConfig {
                            "/comments/deleteComment"
                    ).authenticated()//needed acc to delete , update comment
                    .requestMatchers("/error").permitAll()
+
+
+
+                    //rest routes
+                   .requestMatchers(HttpMethod.POST,
+                           "/api/auth/login",
+                           "/api/auth/signup"
+                    ).permitAll()
+                   .requestMatchers(HttpMethod.GET,
+                           "/api/blogPost/allblogs",
+                           "/api/blogPost/{id:[0-9]+}"
+                   ).permitAll()
+                   .requestMatchers(HttpMethod.POST,
+                           "/api/comments/addComment/**"
+                   ).permitAll()
+
+
+                   .requestMatchers(HttpMethod.POST,
+                           "/api/blogPost/newPost"
+                   ).hasAnyRole("USER", "ADMIN")
+                   .requestMatchers(HttpMethod.PUT,
+                           "/api/blogPost/update",
+                           "/api/comments/updateComment"
+                   ).hasAnyRole("USER", "ADMIN")
+                   .requestMatchers(HttpMethod.DELETE,
+                           "/api/blogPost/deletePost/**",
+                           "/api/comments/deleteComment"
+                   ).hasAnyRole("USER", "ADMIN")
+                   .requestMatchers("/api/auth/me").authenticated()
+
                    .anyRequest().authenticated()
             )
             .formLogin(
@@ -74,7 +107,14 @@ public class webSecurityConfig {
             .sessionManagement(
                 session ->session
                 .maximumSessions(1)
+            )
+            //rest
+            .addFilterBefore(jwtAuthfilter, UsernamePasswordAuthenticationFilter.class)
+            .csrf(
+                 csrf->csrf
+                         .ignoringRequestMatchers("/api/**")
             );
+
         return httpSecurity.build();
     }
 
