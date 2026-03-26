@@ -31,10 +31,12 @@ public class CommentsRestController {
     @PostMapping("/addComment/{postId}")
     public ResponseEntity<?> addComment(
             @PathVariable int postId,
-            @RequestBody CommentDto commentDto
+            @RequestBody CommentDto commentDto,
+            Authentication auth
     ) {
         try {
             commentDto.setPostId(postId);
+            if(auth!=null)commentDto.setEmail(auth.getName());
             commentService.createComment(commentDto);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("message", "Comment added successfully"));
@@ -44,11 +46,12 @@ public class CommentsRestController {
         }
     }
 
-    @PutMapping("/updateComment")
+    @PostMapping("/updateComment")
     public ResponseEntity<?> updateComment(
             @RequestBody CommentDto commentDto,
             Authentication auth
     ) {
+        System.out.println("Rest updateComment ctrl");
         try {
             // canModifyComment needs commentId — which is commentDto.getId()
             if (!canModifyComment(auth, commentDto.getId())) {
