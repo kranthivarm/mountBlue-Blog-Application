@@ -155,9 +155,16 @@ public class BlogsRestController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "UnAuthorised"));
             }
-            if (!hasRole(auth, "ADMIN")) {
-                postDto.setAuthor(auth.getName());
-            }
+//            if (!hasRole(auth, "ADMIN")) {
+//                postDto.setAuthor(auth.getName());
+//            }
+
+            postDto.setAuthor(auth.getName());
+            if (postDto.getTitle() == null) postDto.setTitle(existingPostDto.getTitle());
+            if (postDto.getExcerpt() == null) postDto.setExcerpt(existingPostDto.getExcerpt());
+            if (postDto.getContent() == null) postDto.setContent(existingPostDto.getContent());
+            if (postDto.getTags() == null) postDto.setTags(existingPostDto.getTags());
+
             postService.updatePost(postDto);
             return ResponseEntity.ok(Map.of("message", "post updated"));
         } catch (Exception e) {
