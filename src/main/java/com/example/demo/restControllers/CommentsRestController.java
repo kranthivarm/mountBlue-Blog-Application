@@ -17,13 +17,14 @@ public class CommentsRestController {
     private final CommentService commentService;
 
     private boolean canModifyComment(Authentication auth, int commentId){
-        if(auth==null)return false;
+        if(auth==null )return false;
         if(hasRole(auth,"ADMIN"))return true;
         CommentDto commentDto=commentService.findByCommentId(commentId);
-        if(commentDto!=null && commentDto.getEmail().equals(auth.getName()))return true;
+        if(commentDto!=null && commentDto.getEmail()!=null && commentDto.getEmail().equals(auth.getName()))return true;
         return false;
     }
     private boolean hasRole(Authentication auth, String role){
+        if (auth == null) return false;
         return auth.getAuthorities().stream()
                 .anyMatch(a->a.getAuthority().equals("ROLE_"+role));
     }
@@ -53,7 +54,6 @@ public class CommentsRestController {
     ) {
         System.out.println("Rest updateComment ctrl");
         try {
-            // canModifyComment needs commentId — which is commentDto.getId()
             if (!canModifyComment(auth, commentDto.getId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Unauthorized"));

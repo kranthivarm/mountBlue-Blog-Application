@@ -36,7 +36,7 @@ public class BlogsRestController {
     private boolean canModifyPost(Authentication auth, PostDto post) {
         if (auth == null) return false;
         if (hasRole(auth, "ADMIN")) return true;
-        return hasRole(auth, "USER") && post.getAuthor().equals(auth.getName());
+        return hasRole(auth, "USER") && post.getAuthor()!=null && post.getAuthor().equals(auth.getName());
     }
 
     @GetMapping("/allblogs")
@@ -122,6 +122,10 @@ public class BlogsRestController {
             Authentication auth
     ) {
         try {
+            if (auth == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "User not authenticated"));
+            }
             if (!hasRole(auth, "ADMIN")) {
                 postDto.setAuthor(auth.getName());
             } else {
@@ -159,11 +163,11 @@ public class BlogsRestController {
 //                postDto.setAuthor(auth.getName());
 //            }
 
-            postDto.setAuthor(auth.getName());
-            if (postDto.getTitle() == null) postDto.setTitle(existingPostDto.getTitle());
-            if (postDto.getExcerpt() == null) postDto.setExcerpt(existingPostDto.getExcerpt());
-            if (postDto.getContent() == null) postDto.setContent(existingPostDto.getContent());
-            if (postDto.getTags() == null) postDto.setTags(existingPostDto.getTags());
+            postDto.setAuthor(existingPostDto.getAuthor());
+            if (postDto.getTitle() == null || postDto.getTitle().isBlank()) postDto.setTitle(existingPostDto.getTitle());
+            if (postDto.getExcerpt() == null || postDto.getExcerpt().isBlank()) postDto.setExcerpt(existingPostDto.getExcerpt());
+            if (postDto.getContent() == null || postDto.getContent().isBlank()) postDto.setContent(existingPostDto.getContent());
+            if (postDto.getTags() == null || postDto.getTags().isBlank()) postDto.setTags(existingPostDto.getTags());
 
             postService.updatePost(postDto);
             return ResponseEntity.ok(Map.of("message", "post updated"));

@@ -92,6 +92,7 @@ public class webSecurityConfig {
                 form -> form
                 .loginPage("/auth/login")
                 .loginProcessingUrl("/auth/login")
+
                 .defaultSuccessUrl("/blogPost/allblogs", true)
                 .failureUrl("/auth/login?error=true")
                 .permitAll()

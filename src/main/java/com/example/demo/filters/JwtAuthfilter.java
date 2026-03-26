@@ -50,12 +50,12 @@ public class JwtAuthfilter extends OncePerRequestFilter {
                             .map(SimpleGrantedAuthority:: new)
                             .collect(Collectors.toList());
                     UsernamePasswordAuthenticationToken authToken=
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,null,authorities
-                            );
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,null,authorities
+                        );
                     //this not mandatory;just to set additional/metadat like setDetails; useful for loggin etc
                     authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
+                        new WebAuthenticationDetailsSource().buildDetails(request)
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
